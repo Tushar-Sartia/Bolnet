@@ -1,0 +1,23 @@
+export const COLORS = {
+  BACKGROUND_COLOR_LIGHT: '#FFFFFF',
+  BACKGROUND_COLOR_DARK: '#000000',
+  PRIMARY_COLOR: '#EE1D23',
+  PRIMARY_LIGHT_COLOR: '#FFDCDD',
+  SECONDARY_COLOR: '#0943A3',
+  SECONDARY_LIGHT_COLOR: '#b6d2ff',
+  COLOR_BLACK: '#000000',
+  COLOR_WHITE: '#ffffff',
+  COLOR_RED: '#EE1D23',
+  COLOR_GRAY: '#BDBDBD',
+  COLOR_GRAY_LIGHT: '#eeeeee',
+  COLOR_BLUE: '#0943A3',
+  COLOR_GREEN: '#39CF78',
+
+  // BUTTON_PRIMARY : "orange",
+  // TEXT_SECONDARY_COLOR : '#000',
+  // FONT_REGULAR : 'Roboto-Regular',
+  // FONT_MEDIUM : 'Roboto-Medium',
+  // FONT_BOLD : 'Roboto-Bold',
+  // FONT_ITALIC : 'Roboto-Italic',
+  // FONT_MEDIUM_ITALIC : 'Roboto-MediumItalic'
+};
