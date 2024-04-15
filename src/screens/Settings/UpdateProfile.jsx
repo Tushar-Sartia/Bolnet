@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,14 +7,14 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import {Formik} from 'formik';
-import {COLORS} from '../../utils/theme';
+import { Formik } from 'formik';
+import { COLORS } from '../../utils/theme';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import {useDispatch, useSelector} from 'react-redux';
-import {selectUser, setUser} from '../../features/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser, setUser, signIn } from '../../features/auth/authSlice';
 import ImagePicker from 'react-native-image-crop-picker';
-import {profileInformationSchema} from '../../utils/validationSchema';
+import { profileInformationSchema } from '../../utils/validationSchema';
 import {
   getAllCities,
   getAllStates,
@@ -22,17 +22,17 @@ import {
   updateUserDetails,
 } from '../../services/userApi';
 import Toast from 'react-native-toast-message';
-import {API_URL, MEDIA_URL} from '../../utils/constants';
+import { API_URL, MEDIA_URL } from '../../utils/constants';
 import {
   PERMISSIONS,
   checkMultiple,
   openSettings,
   requestMultiple,
 } from 'react-native-permissions';
-import {DUMMY_PROFILE_IMAGE} from '../../utils/images';
+import { DUMMY_PROFILE_IMAGE } from '../../utils/images';
 
 const UpdateProfile = () => {
-  const {user} = useSelector(selectUser);
+  const { user } = useSelector(selectUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [width, setWidth] = useState(70);
@@ -40,7 +40,6 @@ const UpdateProfile = () => {
   const [statesData, setStatesData] = useState([]);
   const [citiesData, setCitiesData] = useState([]);
   const dispatch = useDispatch();
-  const [showImage, setShowImage] = useState(false);
 
   const askMediPermission = async () => {
     if (Platform.OS === 'android') {
@@ -53,51 +52,35 @@ const UpdateProfile = () => {
       ]);
     }
   };
-
-  const handleUpdateProfile = async () => {
-    const bodyFormData = new FormData();
-    bodyFormData.append('profile_pic', {
-      name: new Date().getTime() + '.jpg',
-      uri: selectedImage,
-      type: 'image/jpeg',
-    });
-    bodyFormData.append('id', user?.id);
-    // return console.log({ ...bodyFormData });
-    const res = await updateProfile(bodyFormData);
-    // console.log(JSON.stringify(res, null, 2));
-    if (res.status) {
-      Toast.show({
-        type: 'success',
-        text2: res.message,
-        position: 'bottom',
-        visibilityTime: 3000,
-      });
-      dispatch(setUser(res.data));
-      setShowImage(false);
-    } else {
-      Toast.show({
+  const handleUpdateProfileData = async values => {
+    setIsSubmitting(true);
+    const fData = new FormData();
+    if (!selectedImage && !user?.image) {
+      return Toast.show({
         type: 'error',
-        text2: res.message,
+        text2: 'Please Upload Image',
         position: 'bottom',
         visibilityTime: 3000,
       });
     }
-  };
 
-  const handleUpdateProfileData = async values => {
-    setIsSubmitting(true);
-    const fData = new FormData();
+    fData.append('image', {
+      name: new Date().getTime() + '.jpg',
+      uri: selectedImage || user?.image,
+      type: 'image/jpeg',
+    });
     fData.append('id', user?.id);
     fData.append('name', values.name);
-    fData.append('phone', values.phone);
+    fData.append('mobile', values.phone);
     fData.append('email', values.email);
     fData.append('address', values.address);
     fData.append('country_id', values.country);
     fData.append('state', values.state);
     fData.append('city', values.city);
-    fData.append('pin_code', values.pincode);
+    fData.append('pincode', values.pincode);
     const res = await updateUserDetails(fData);
     if (res.status) {
+      dispatch(signIn(res.data));
       Toast.show({
         type: 'success',
         text2: res.message,
@@ -134,14 +117,14 @@ const UpdateProfile = () => {
             setSelectedImage(image.path);
             setHeight(height);
             setWidth(width);
-            setShowImage(true);
+            // setShowImage(true);
           }
         })
         .catch(error => {
           console.log(error);
         });
     } else if (selectedImage) {
-      setShowImage(true);
+      // setShowImage(true);
     } else {
       Alert.alert(
         'Please provide permissions',
@@ -152,7 +135,7 @@ const UpdateProfile = () => {
             onPress: () => console.log('Cancel Pressed'),
             style: 'cancel',
           },
-          {text: 'OK', onPress: openSettings},
+          { text: 'OK', onPress: openSettings },
         ],
       );
     }
@@ -197,60 +180,65 @@ const UpdateProfile = () => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{flexGrow: 1}}
+      contentContainerStyle={{ flexGrow: 1 }}
       style={styles.container}>
       <SafeAreaView style={styles.container}>
         <Formik
           enableReinitialize={true}
           initialValues={{
+            image:user?.image||'',
             name: user?.name || '',
             email: user?.email || '',
-            phone: user?.phone || '',
+            phone: user?.mobile || '',
             address: user?.address || '',
             country: 101 || '',
             state: user?.state || '',
             city: user?.city || '',
-            pincode: user?.pin_code || '',
+            pincode: user?.pincode || '',
           }}
           validationSchema={profileInformationSchema}
           onSubmit={handleUpdateProfileData}>
           {props => (
             <View style={styles.formContainer}>
               <View style={styles.imageContainer}>
-                <Image
-                  source={
-                    selectedImage
-                      ? {uri: selectedImage}
-                      : user?.profile_pic
-                      ? {uri: `${MEDIA_URL}/${user?.profile_pic}`}
-                      : DUMMY_PROFILE_IMAGE
-                    //   {
-                    //   uri: selectedImage
-                    //     ? selectedImage
-                    //     : user?.profile_pic
-                    //     ? `${API_URL}/${user?.profile_pic}`
-                    //     : 'https://thewingshield.com/office/files/profile_images//_file601903341d32e-avatar.png',
-                    // }
-                  }
-                  style={{
-                    width: 100,
-                    height: 100,
-                    resizeMode: 'cover',
-                  }}
-                />
-                {!showImage ? (
-                  <Button
-                    title={'choose Profile Image'}
-                    color="primary"
-                    onPress={() => handleImagePicker()}
+                <View style={{ borderWidth: 3, borderRadius: 50, borderColor: 'red' }}>
+                  <Image
+                    source={
+                      selectedImage
+                        ? { uri: selectedImage }
+                        : user?.image
+                          ? { uri: `${API_URL}/${user?.image}` }
+                          : DUMMY_PROFILE_IMAGE
+                      //   {
+                      //   uri: selectedImage
+                      //     ? selectedImage
+                      //     : user?.image
+                      //     ? `${API_URL}/${user?.image}`
+                      //     : 'https://thewingshield.com/office/files/profile_images//_file601903341d32e-avatar.png',
+                      // }
+                    }
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 80,
+                      borderWidth: 2,
+                      resizeMode: 'cover',
+                    }}
                   />
-                ) : (
+                </View>
+                {/* {!showImage ? ( */}
+                <Button
+                  title={'choose Profile Image'}
+                  color="primary"
+                  onPress={() => handleImagePicker()}
+                />
+                {/* ) : (
                   <Button
                     title={'Save Image Profile'}
                     color="success"
                     onPress={() => handleUpdateProfile()}
                   />
-                )}
+                )} */}
               </View>
 
               <Input label="Name" name={'name'} formikProps={props} />
@@ -280,10 +268,10 @@ const UpdateProfile = () => {
                 select={{
                   isSelect: true,
                 }}
-                data={[{label: 'India', value: 101}]}
+                data={[{ label: 'India', value: 101 }]}
               />
-              <View style={{flexDirection: 'row', gap: 20}}>
-                <View style={{flex: 1}}>
+              <View style={{ flexDirection: 'row', gap: 20 }}>
+                <View style={{ flex: 1 }}>
                   <Input
                     label="State"
                     name={'state'}
@@ -298,7 +286,7 @@ const UpdateProfile = () => {
                     data={statesData}
                   />
                 </View>
-                <View style={{flex: 1}}>
+                <View style={{ flex: 1 }}>
                   <Input
                     label="City"
                     name={'city'}
@@ -337,7 +325,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND_COLOR_LIGHT,
   },
-  imageContainer: {flexDirection: 'row', gap: 20, alignItems: 'center'},
+  imageContainer: { flexDirection: 'row', gap: 20, alignItems: 'center' },
   formContainer: {
     backgroundColor: COLORS.BACKGROUND_COLOR_LIGHT,
     flex: 1,

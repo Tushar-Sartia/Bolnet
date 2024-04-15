@@ -28,14 +28,13 @@ const Register = ({ navigation }) => {
     setIsSubmitting(true);
     const fData = new FormData();
     fData.append('name', values.name);
-    fData.append('phone', values.phone);
+    fData.append('mobile', values.phone);
     fData.append('email', values.email);
     fData.append('password', values.password);
-    fData.append('country', values.country);
-    fData.append('state', values.state);
-    fData.append('city', values.city);
+    fData.append('country', values.country||null);
+    fData.append('state', values.state||null);
+    fData.append('city', values.city||null);
     const res = await registerInvestor(fData);
-    // console.log(res);
     if (res.status) {
       Toast.show({
         type: 'success',

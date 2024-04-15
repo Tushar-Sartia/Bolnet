@@ -1,19 +1,20 @@
 import Axios from 'axios';
-import {API_URL} from '../utils/constants';
+import { API_URL } from '../utils/constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const customApi = Axios.create({
   baseURL: API_URL,
 });
 customApi.interceptors.request.use(async config => {
-  // let token = await AsyncStorage.getItem('token');
-  // if (token) {
-  //   config.headers['Authorization'] = `Token ${token}`;
-  // }
+  let token = await AsyncStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Token ${token}`;
+  }
   return config;
 });
 export const loginInvestor = async body => {
   try {
-    const {data} = await customApi.post(`/investor_login`, body);
+    const { data } = await customApi.post(`/user/userLogin`, body);
     return data;
   } catch (error) {
     return {
@@ -24,7 +25,7 @@ export const loginInvestor = async body => {
 };
 export const verifyPhoneInvestor = async body => {
   try {
-    const {data} = await customApi.post(`/investor_forgot_password`, body);
+    const { data } = await customApi.post(`/investor_forgot_password`, body);
     return data;
   } catch (error) {
     return {
@@ -35,7 +36,7 @@ export const verifyPhoneInvestor = async body => {
 };
 export const verifyOtpInvestor = async body => {
   try {
-    const {data} = await customApi.post(`/otp_verify`, body);
+    const { data } = await customApi.post(`/otp_verify`, body);
     return data;
   } catch (error) {
     return {
@@ -46,7 +47,7 @@ export const verifyOtpInvestor = async body => {
 };
 export const resetPasswordApi = async body => {
   try {
-    const {data} = await customApi.post(`/investor_otp_password_change`, body);
+    const { data } = await customApi.post(`/investor_otp_password_change`, body);
     return data;
   } catch (error) {
     return {
@@ -57,7 +58,7 @@ export const resetPasswordApi = async body => {
 };
 export const registerInvestor = async body => {
   try {
-    const {data} = await customApi.post(`/investor_sign_up`, body, {
+    const { data } = await customApi.post(`/user/createUser`, body, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -72,7 +73,7 @@ export const registerInvestor = async body => {
 };
 export const getAllProducts = async () => {
   try {
-    const {data} = await customApi.get(`/products_details`);
+    const { data } = await customApi.get(`/products_details`);
     return data;
   } catch (error) {
     return {
@@ -83,7 +84,7 @@ export const getAllProducts = async () => {
 };
 export const updateInvesterPassword = async values => {
   try {
-    const {data} = await customApi.post(`/investor_password_change`, values);
+    const { data } = await customApi.post(`/user/changePassword`, values);
     return data;
   } catch (error) {
     return {
@@ -94,7 +95,7 @@ export const updateInvesterPassword = async values => {
 };
 export const getAllStates = async () => {
   try {
-    const {data} = await customApi.get(`/get_state/101`);
+    const { data } = await customApi.get(`/get_state/101`);
     return data;
   } catch (error) {
     return {
@@ -105,7 +106,7 @@ export const getAllStates = async () => {
 };
 export const getAllCities = async id => {
   try {
-    const {data} = await customApi.get(`/get_city/${id}`);
+    const { data } = await customApi.get(`/get_city/${id}`);
     return data;
   } catch (error) {
     return {
@@ -116,7 +117,7 @@ export const getAllCities = async id => {
 };
 export const getUserBankDetails = async values => {
   try {
-    const {data} = await customApi.get(`/get-bank-detalis`, values);
+    const { data } = await customApi.get(`/get-bank-detalis`, values);
     return data;
   } catch (error) {
     return {
@@ -127,7 +128,7 @@ export const getUserBankDetails = async values => {
 };
 export const updateUserDetails = async values => {
   try {
-    const {data} = await customApi.post(`/investor_update`, values, {
+    const { data } = await customApi.post(`/user/updateProfile`, values, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -142,7 +143,7 @@ export const updateUserDetails = async values => {
 };
 export const contactFormApi = async values => {
   try {
-    const {data} = await customApi.post(`/send_query`, values);
+    const { data } = await customApi.post(`/send_query`, values);
     return data;
   } catch (error) {
     return {
@@ -153,7 +154,7 @@ export const contactFormApi = async values => {
 };
 export const updateProfile = async values => {
   try {
-    const {data} = await customApi.post('/investor_profile_update', values, {
+    const { data } = await customApi.post('/investor_profile_update', values, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -168,7 +169,7 @@ export const updateProfile = async values => {
 };
 export const investFormApi = async values => {
   try {
-    const {data} = await customApi.post('/investor_invest', values, {
+    const { data } = await customApi.post('/investor_invest', values, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -183,7 +184,7 @@ export const investFormApi = async values => {
 };
 export const updateNomineDetails = async values => {
   try {
-    const {data} = await customApi.post('/investor_nomine_update', values, {
+    const { data } = await customApi.post('/investor_nomine_update', values, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -199,7 +200,7 @@ export const updateNomineDetails = async values => {
 };
 export const getInvestmentHistory = async id => {
   try {
-    const {data} = await customApi.get(`/get-investment-history/${id}`);
+    const { data } = await customApi.get(`/get-investment-history/${id}`);
     return data;
   } catch (error) {
     return {
@@ -210,7 +211,7 @@ export const getInvestmentHistory = async id => {
 };
 export const getAdminDetails = async () => {
   try {
-    const {data} = await customApi.get(`/admin_details`);
+    const { data } = await customApi.get(`/admin_details`);
     return data;
   } catch (error) {
     return {
@@ -221,7 +222,7 @@ export const getAdminDetails = async () => {
 };
 export const getWalletDataApi = async id => {
   try {
-    const {data} = await customApi.get(`/investment_history/${id}`);
+    const { data } = await customApi.get(`/investment_history/${id}`);
     return data;
   } catch (error) {
     return {
@@ -232,7 +233,7 @@ export const getWalletDataApi = async id => {
 };
 export const withdrawAmountApi = async values => {
   try {
-    const {data} = await customApi.post(`/investor_withdrawal`, values);
+    const { data } = await customApi.post(`/investor_withdrawal`, values);
     return data;
   } catch (error) {
     return {
@@ -243,7 +244,7 @@ export const withdrawAmountApi = async values => {
 };
 export const deleteAccountApi = async id => {
   try {
-    const {data} = await customApi.get(`/investment_delete_account/${id}`);
+    const { data } = await customApi.get(`/investment_delete_account/${id}`);
     return data;
   } catch (error) {
     return {
@@ -254,7 +255,7 @@ export const deleteAccountApi = async id => {
 };
 export const dashboardApi = async id => {
   try {
-    const {data} = await customApi.get(`/investment_dashboard/${id}`);
+    const { data } = await customApi.get(`/investment_dashboard/${id}`);
     return data;
   } catch (error) {
     return {

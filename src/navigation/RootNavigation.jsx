@@ -46,7 +46,7 @@ const RootNavigation = () => {
         headerTintColor: COLORS.COLOR_WHITE,
         headerBackTitleVisible: false,
       }}>
-      {!isAuthenticated ? (
+      {isAuthenticated ? (
         <Stack.Group>
           <Stack.Screen
             name={ROUTES.home}

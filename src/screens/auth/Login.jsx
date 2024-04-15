@@ -20,6 +20,7 @@ import { useDispatch } from 'react-redux';
 import { signIn } from '../../features/auth/authSlice';
 import { loginInvestor } from '../../services/userApi';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -30,11 +31,12 @@ const Login = ({ navigation }) => {
   const handleLogin = async values => {
     setIsSubmitting(true);
     const body = {
-      phone: values.phone,
+      mobile: values.phone,
       password: values.password,
     };
     const res = await loginInvestor(body);
     if (res.status) {
+      await AsyncStorage.setItem('token', res.token);
       dispatch(signIn(res.data));
     } else {
       Toast.show({
@@ -66,8 +68,8 @@ const Login = ({ navigation }) => {
         </View>
         <Formik
           initialValues={{
-            phone: '',
-            password: '',
+            phone: '9876543210',
+            password: '12345678',
           }}
           validationSchema={loginSchema}
           onSubmit={handleLogin}>
