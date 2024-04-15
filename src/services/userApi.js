@@ -184,11 +184,23 @@ export const investFormApi = async values => {
 };
 export const updateNomineDetails = async values => {
   try {
-    const { data } = await customApi.post('/investor_nomine_update', values, {
+    const { data } = await customApi.post('/user/nomineeUpdate', values, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return data;
+  } catch (error) {
+    console.log('error', error.message);
+    return {
+      status: false,
+      message: error?.response?.data?.message || error?.message,
+    };
+  }
+};
+export const getNominee = async (body) => {
+  try {
+    const { data } = await customApi.get(`/user/getNominee/${body}`);
     return data;
   } catch (error) {
     console.log('error', error.message);
@@ -211,7 +223,7 @@ export const getInvestmentHistory = async id => {
 };
 export const getAdminDetails = async () => {
   try {
-    const { data } = await customApi.get(`/admin_details`);
+    const { data } = await customApi.get(`/admin_details`,);
     return data;
   } catch (error) {
     return {

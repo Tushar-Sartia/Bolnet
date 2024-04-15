@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,6 +7,8 @@ import {
   SafeAreaView,
   Image,
   TouchableOpacity,
+  Text,
+  ActivityIndicator,
 } from 'react-native';
 import { COLORS } from '../../utils/theme';
 import { Formik } from 'formik';
@@ -15,7 +17,7 @@ import Button from '../../components/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
 import { selectUser, setUser } from '../../features/auth/authSlice';
-import { updateNomineDetails } from '../../services/userApi';
+import { getNominee, updateNomineDetails } from '../../services/userApi';
 import Toast from 'react-native-toast-message';
 import { CameraIcon } from 'lucide-react-native';
 import { nomineeSchema } from '../../utils/validationSchema';
@@ -27,6 +29,7 @@ import {
   requestMultiple,
 } from 'react-native-permissions';
 import { DUMMY_PROFILE_IMAGE } from '../../utils/images';
+import { useIsFocused } from '@react-navigation/native';
 
 const Nominee = () => {
   const { user } = useSelector(selectUser);
@@ -34,8 +37,9 @@ const Nominee = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [width, setWidth] = useState(70);
   const [height, setHeight] = useState(70);
-  const dispatch = useDispatch();
-
+  const [nomineeDetail, setNomineeDetails] = useState([])
+  const [loader, setLoader] = useState(false)
+  const isFocused = useIsFocused()
   const askMediPermission = async () => {
     if (Platform.OS === 'android') {
       const result = await requestMultiple([
@@ -50,16 +54,23 @@ const Nominee = () => {
 
   const handleUpdateNominee = async values => {
     const bodyFormData = new FormData();
-    bodyFormData.append('id', user?.id);
-    bodyFormData.append('nomine', values.nomine);
+    bodyFormData.append('created_by', user?.id);
+    bodyFormData.append('nominee', values.nominee);
     if (selectedImage) {
-      bodyFormData.append('nomine_file', {
+      bodyFormData.append('nominee_image', {
         name: new Date().getTime() + '.jpg',
         uri: selectedImage,
         type: 'image/jpeg',
       });
     }
-
+    else {
+      return Toast.show({
+        type: 'error',
+        text2: 'Please Upload New Image',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
+    }
     const res = await updateNomineDetails(bodyFormData);
     if (res.status) {
       Toast.show({
@@ -68,7 +79,6 @@ const Nominee = () => {
         position: 'bottom',
         visibilityTime: 3000,
       });
-      dispatch(setUser(res.data));
       setSelectedImage(null);
     } else {
       Toast.show({
@@ -78,6 +88,7 @@ const Nominee = () => {
         visibilityTime: 3000,
       });
     }
+    getAllNominee()
   };
   const handleImagePicker = async () => {
     askMediPermission();
@@ -114,27 +125,47 @@ const Nominee = () => {
       );
     }
   };
+  const getAllNominee = async () => {
+    setLoader(true)
+    try {
+      const res = await getNominee(user?.id)
+      if (res.status) {
+        setNomineeDetails(res?.data[0])
+      }
+    } catch (err) {
+      console.log(err.message)
+    }
+    setLoader(false)
+  }
+  useEffect(() => {
+    getAllNominee()
+  }, [isFocused])
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ flexGrow: 1 }}
-      style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Formik
-          initialValues={{
-            nomine: user?.nomine || '',
-            nomine_file: user?.nomine_file || null,
-          }}
-          validationSchema={nomineeSchema}
-          onSubmit={handleUpdateNominee}>
-          {props => (
-            <>
-              <View style={styles.formContainer}>
-                <Input label="Nominee Name" name={'nomine'} formikProps={props} />
-                <View style={{ marginBottom: 20, alignItems: 'center' }}>
-                  <TouchableOpacity onPress={handleImagePicker}>
-                    {
-                      <>
+    <>
+      {loader ?
+        <ActivityIndicator
+          style={{ paddingLeft: 15, paddingRight: 15 }}
+          size="large"
+          color="red"
+        />
+        : <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+          style={styles.container}>
+          <SafeAreaView style={styles.container}>
+            <Formik
+              initialValues={{
+                nominee: nomineeDetail?.nominee || '',
+                nominee_image: nomineeDetail?.nominee_image || null,
+              }}
+              validationSchema={nomineeSchema}
+              onSubmit={handleUpdateNominee}>
+              {props => (
+                <>
+                  <View style={styles.formContainer}>
+                    <Input label="Nominee Name" name={'nominee'} formikProps={props} />
+                    <View style={{ marginBottom: 20, alignItems: 'center' }}>
+                      <TouchableOpacity onPress={handleImagePicker}>
                         <View
                           style={{
                             flexDirection: 'row',
@@ -147,40 +178,33 @@ const Nominee = () => {
                             source={
                               selectedImage
                                 ? { uri: selectedImage }
-                                : user?.nomine_file
-                                  ? { uri: `${MEDIA_URL}/${user?.nomine_file}` }
+                                : nomineeDetail?.nominee_image
+                                  ? { uri: `${API_URL}/${nomineeDetail?.nominee_image}` }
                                   : DUMMY_PROFILE_IMAGE
                             }
-                            // source={{
-                            //   uri: selectedImage
-                            //     ? selectedImage
-                            //     : user?.nomine_file
-                            //     ? `${MEDIA_URL}/${user?.nomine_file}`
-                            //     : 'https://thewingshield.com/office/files/profile_images//_file601903341d32e-avatar.png',
-                            // }}
                             style={styles.image}
                           />
                           <View style={styles.iconStyle}>
                             <CameraIcon size={28} color={COLORS.COLOR_WHITE} />
                           </View>
                         </View>
-                      </>
-                    }
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={styles.margins}>
-                <Button
-                  title={'update nominee'}
-                  isLoading={isSubmitting}
-                  onPress={props.handleSubmit}
-                />
-              </View>
-            </>
-          )}
-        </Formik>
-      </SafeAreaView>
-    </ScrollView>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={styles.margins}>
+                    <Button
+                      title={'update nominee'}
+                      isLoading={isSubmitting}
+                      onPress={props.handleSubmit}
+                    />
+                  </View>
+                </>
+              )}
+            </Formik>
+          </SafeAreaView>
+        </ScrollView>
+      }
+    </>
   );
 };
 const styles = StyleSheet.create({

@@ -78,7 +78,7 @@ export const contactFormSchema = Yup.object().shape({
   message: Yup.string().required('Message is Required'),
 });
 export const nomineeSchema = Yup.object().shape({
-  nomine: Yup.string().required('Name is Required'),
+  nominee: Yup.string().required('Nominee Name is Required'),
 });
 export const amountSchema = Yup.object().shape({
   amount: Yup.string().required('Amount is Required'),
