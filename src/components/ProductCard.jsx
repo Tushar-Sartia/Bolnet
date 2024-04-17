@@ -1,15 +1,16 @@
 import React from 'react';
 import { StyleSheet, View, Text, Image, Pressable } from 'react-native';
 import { COLORS } from '../utils/theme';
-import { MEDIA_URL } from '../utils/constants';
+import { API_URL, MEDIA_URL } from '../utils/constants';
 import Button from './Button';
+import { ROUTES } from '../utils/routes';
+import { moneyFormat } from '../utils/formatter';
 
 const ProductCard = ({ item, idx, navigation }) => {
-  const updatedImagePath = item?.image?.replace('public/', '');
 
   return (
     <View style={[styles.container, { marginTop: idx % 2 !== 0 ? 30 : 0 }]}>
-      <Pressable onPress={() => { }}>
+      <Pressable onPress={() => { navigation.navigate(ROUTES.viewProduct, { item }) }}>
         {({ pressed }) => (
           <View
             style={{
@@ -17,12 +18,17 @@ const ProductCard = ({ item, idx, navigation }) => {
             }}>
             <View style={styles.imageContainer}>
               <Image
-                source={{ uri: MEDIA_URL + '/' + updatedImagePath }}
+                source={{ uri: API_URL + '/' + item?.productImage }}
                 style={styles.image}
               />
               <View style={styles.detailsContainer}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text numberOfLines={1}>{item.details}</Text>
+                <Text style={styles.name} numberOfLines={1}>{item.productName}</Text>
+                <View style={styles.nameContainer}>
+                  <Text style={[styles.name]} numberOfLines={1}>{moneyFormat(item.price).split('.00')}</Text>
+                  <Text style={[styles.oldPrice, { textDecorationLine: 'line-through' }]}>{moneyFormat(item?.oldPrice).split('.00')}</Text>
+                  {item?.discount &&
+                    <Text style={[styles.oldPrice]} numberOfLines={2}>({item?.discount}% off)</Text>
+                  }</View>
               </View>
               <View style={styles.buttonContainer}>
                 <Button title={'Add to Cart'} textStyle={styles.buttonText} />
@@ -44,35 +50,46 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.BACKGROUND_COLOR_LIGHT,
     width: '100%',
     borderRadius: 8,
-    paddingHorizontal:5,
-    borderWidth: 1,
-    elevation:10,
+    padding: 5,
+    elevation: 10,
     overflow: 'hidden',
-    alignItems: 'center', 
+    alignItems: 'center',
   },
   image: {
     width: '100%',
     height: 200,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
+    borderRadius: 5
   },
   detailsContainer: {
     paddingHorizontal: 10,
-    alignSelf:'flex-start'
+    alignSelf: 'flex-start',
   },
   name: {
-    color: COLORS.COLOR_GREEN,
     fontWeight: 'bold',
-    fontSize: 18,
+    textTransform: 'capitalize',
+    fontSize: 16,
+    color: COLORS.COLOR_BLACK
   },
   buttonContainer: {
     alignSelf: 'center',
     marginVertical: 10,
-    marginBottom:20,
   },
   buttonText: {
     fontSize: 12,
     paddingVertical: 3,
   },
+  oldPrice: {
+    fontSize: 13,
+    marginTop: 3,
+    color: COLORS.COLOR_RED
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 3,
+    flexWrap: 'wrap'
+  }
 });
 
 export default ProductCard;

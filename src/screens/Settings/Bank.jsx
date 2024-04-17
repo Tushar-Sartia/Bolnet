@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { COLORS } from '../../utils/theme';
 import { Formik } from 'formik';
 import Input from '../../components/Input';
@@ -7,31 +7,35 @@ import Button from '../../components/Button';
 import { bankSchema } from '../../utils/validationSchema';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, setUser } from '../../features/auth/authSlice';
-import { updateUserDetails } from '../../services/userApi';
+import { getUserBankDetails, updateUserDetails } from '../../services/userApi';
 import Toast from 'react-native-toast-message';
+import { useIsFocused } from '@react-navigation/native';
 
 
 const Bank = () => {
+  const [loader, setLoader] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useSelector(selectUser)
+  const [userBankDetail, setUserBankDetail] = useState([])
   const dispatch = useDispatch()
-
+  const isFocused = useIsFocused()
   const handleUpdateBankAccount = async (values) => {
     setIsSubmitting(true);
-    const fData = new FormData();
-    fData.append('id', user?.id);
-    fData.append('account_holder_name', values.account_holder_name);
-    fData.append('bank_name', values.bank_name);
-    fData.append('ifsc_code', values.ifsc);
-    fData.append('account_number', values.account_number);
-    const res = await updateUserDetails(fData);
+
+    const body = {
+      userId: user?.id,
+      accountNumber: values.accountNumber,
+      bankName: values.bankName,
+      userName: values.userName,
+      ifscCode: values.ifscCode,
+    }
+    const res = await updateUserDetails(body);
     if (res.status) {
       Toast.show({
         type: 'success',
         text2: res.message,
         position: 'bottom',
       });
-      dispatch(setUser(res.data));
     } else {
       Toast.show({
         type: 'error',
@@ -41,53 +45,69 @@ const Bank = () => {
     }
     setIsSubmitting(false);
   };
-
-  // useEffect(() => {
-  //   user
-  // }, [isFocused])
+  const getDetail = async () => {
+    setLoader(false)
+    const body = {
+      userId: user?.id
+    }
+    const res = await getUserBankDetails(body)
+    if (res) {
+      setUserBankDetail(res.data[0])
+    }
+    setLoader(false)
+  }
+  useEffect(() => {
+    if (isFocused)
+      getDetail()
+  }, [isFocused])
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ flexGrow: 1 }}
-      style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Formik
-          initialValues={{
-            bank_name: user?.bank_name || '',
-            account_number: user?.account_number || '',
-            ifsc: user?.ifsc_code || '',
-            account_holder_name: user?.account_holder_name || '',
-          }}
-          validationSchema={bankSchema}
-          onSubmit={handleUpdateBankAccount}>
-          {props => (
-            <View style={styles.formContainer}>
-              <Input label="Bank Name" name={'bank_name'} formikProps={props} />
-              <Input
-                label="Account Number"
-                name={'account_number'}
-                formikProps={props}
-                inputProps={{
-                  keyboardType: 'phone-pad',
-                }}
-              />
-              <Input label="IFSC code" name={'ifsc'} formikProps={props} />
-              <Input
-                label="Account Holder Name"
-                name={'account_holder_name'}
-                formikProps={props}
-              />
-              <Button
-                title={'update bank details'}
-                isLoading={isSubmitting}
-                onPress={props.handleSubmit}
-              />
-            </View>
-          )}
-        </Formik>
-      </SafeAreaView>
-    </ScrollView>
+    <>{loader ?
+      <ActivityIndicator size={'large'} color={'red'} />
+      :
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+        style={styles.container}>
+        <SafeAreaView style={styles.container}>
+          <Formik
+            initialValues={{
+              bankName: userBankDetail?.bankName || '',
+              accountNumber: userBankDetail?.accountNumber?.toString() || '',
+              ifscCode: userBankDetail?.ifscCode || '',
+              userName: userBankDetail?.userName || '',
+            }}
+            validationSchema={bankSchema}
+            enableReinitialize
+            onSubmit={handleUpdateBankAccount}>
+            {props => (
+              <View style={styles.formContainer}>
+                <Input label="Bank Name" name={'bankName'} formikProps={props} />
+                <Input
+                  label="Account Number"
+                  name={'accountNumber'}
+                  formikProps={props}
+                  inputProps={{
+                    keyboardType: 'phone-pad',
+                  }}
+                />
+                <Input label="IFSC code" name={'ifscCode'} formikProps={props} />
+                <Input
+                  label="Account Holder Name"
+                  name={'userName'}
+                  formikProps={props}
+                />
+                <Button
+                  title={'update bank details'}
+                  isLoading={isSubmitting}
+                  onPress={props.handleSubmit}
+                />
+              </View>
+            )}
+          </Formik>
+        </SafeAreaView>
+      </ScrollView>}
+    </>
   );
 };
 const styles = StyleSheet.create({

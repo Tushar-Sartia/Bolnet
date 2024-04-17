@@ -73,7 +73,7 @@ export const registerInvestor = async body => {
 };
 export const getAllProducts = async () => {
   try {
-    const { data } = await customApi.get(`/products_details`);
+    const { data } = await customApi.get(`/product/`);
     return data;
   } catch (error) {
     return {
@@ -82,6 +82,41 @@ export const getAllProducts = async () => {
     };
   }
 };
+export const getProductDetails = async (id) => {
+  try {
+    const { data } = await customApi.get(`/product/getProductDetail/${id}`);
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+export const getProductSpecification = async (id) => {
+  try {
+    const { data } = await customApi.get(`/product/getProductSpecification/${id}`);
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+export const getProductReviews = async (id) => {
+  try {
+    const { data } = await customApi.get(`/product/getProductReviews/${id}`);
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+
+
 export const updateInvesterPassword = async values => {
   try {
     const { data } = await customApi.post(`/user/changePassword`, values);
@@ -117,7 +152,8 @@ export const getAllCities = async id => {
 };
 export const getUserBankDetails = async values => {
   try {
-    const { data } = await customApi.get(`/get-bank-detalis`, values);
+    const { data } = await customApi.post(`/user/getBankDetails`, values
+    );
     return data;
   } catch (error) {
     return {
@@ -128,11 +164,13 @@ export const getUserBankDetails = async values => {
 };
 export const updateUserDetails = async values => {
   try {
-    const { data } = await customApi.post(`/user/updateProfile`, values, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const { data } = await customApi.post(`/user/addBankDetails`, values,
+      //  {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      // }
+    );
     return data;
   } catch (error) {
     return {

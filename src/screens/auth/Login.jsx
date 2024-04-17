@@ -68,7 +68,7 @@ const Login = ({ navigation }) => {
         </View>
         <Formik
           initialValues={{
-            phone: '9876543210',
+            phone: '9999966858',
             password: '12345678',
           }}
           validationSchema={loginSchema}

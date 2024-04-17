@@ -12,7 +12,8 @@ export const COLORS = {
   COLOR_GRAY_LIGHT: '#eeeeee',
   COLOR_BLUE: '#0943A3',
   COLOR_GREEN: '#39CF78',
-
+  COLOR_GOLD: '#ffd700',
+  
   // BUTTON_PRIMARY : "orange",
   // TEXT_SECONDARY_COLOR : '#000',
   // FONT_REGULAR : 'Roboto-Regular',

@@ -30,7 +30,7 @@ const Products = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderBg />{console.log(allProducts)}
+      <HeaderBg />
       <FlatList
         data={allProducts}
         keyExtractor={itm => itm.id}
