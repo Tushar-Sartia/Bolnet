@@ -115,6 +115,51 @@ export const getProductReviews = async (id) => {
     };
   }
 };
+export const addToCart = async (body) => {
+  try {
+    const { data } = await customApi.post('/cart/addToCart', body)
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    }
+  }
+}
+export const getCartItems = async (id) => {
+  try {
+    const { data } = await customApi.get(`/cart/${id}`)
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    }
+  }
+}
+export const removeItemFromCart = async (body) => {
+  try {
+    const { data } = await customApi.post(`/cart/deleteItemFromCart`, body)
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    }
+  }
+}
+export const updateCartQty = async (body) => {
+  try {
+    const { data } = await customApi.put(`/cart/updateItemFromCart`, body)
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    }
+  }
+}
+
 
 
 export const updateInvesterPassword = async values => {
@@ -229,7 +274,6 @@ export const updateNomineDetails = async values => {
     });
     return data;
   } catch (error) {
-    console.log('error', error.message);
     return {
       status: false,
       message: error?.response?.data?.message || error?.message,
@@ -241,7 +285,6 @@ export const getNominee = async (body) => {
     const { data } = await customApi.get(`/user/getNominee/${body}`);
     return data;
   } catch (error) {
-    console.log('error', error.message);
     return {
       status: false,
       message: error?.response?.data?.message || error?.message,

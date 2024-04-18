@@ -5,9 +5,36 @@ import { API_URL, MEDIA_URL } from '../utils/constants';
 import Button from './Button';
 import { ROUTES } from '../utils/routes';
 import { moneyFormat } from '../utils/formatter';
+import { selectUser } from '../features/auth/authSlice';
+import { useSelector } from 'react-redux';
+import { addToCart } from '../services/userApi';
+import Toast from 'react-native-toast-message';
 
 const ProductCard = ({ item, idx, navigation }) => {
+  const { user } = useSelector(selectUser)
 
+  const handleAddToCart = async (item) => {
+    const cartItem = {
+      productId: item?.id,
+      quantity: 1,
+      userId: user?.id
+    }
+    const res = await addToCart(cartItem)
+    if (res?.status) {
+      Toast.show({
+        type: "success",
+        text1: res?.message,
+        position: "bottom",
+      })
+    }
+    else {
+      Toast.show({
+        type: "error",
+        text2: res?.message,
+        position: "bottom",
+      })
+    }
+  }
   return (
     <View style={[styles.container, { marginTop: idx % 2 !== 0 ? 30 : 0 }]}>
       <Pressable onPress={() => { navigation.navigate(ROUTES.viewProduct, { item }) }}>
@@ -31,7 +58,7 @@ const ProductCard = ({ item, idx, navigation }) => {
                   }</View>
               </View>
               <View style={styles.buttonContainer}>
-                <Button title={'Add to Cart'} textStyle={styles.buttonText} />
+                <Button title={'Add to Cart'} textStyle={styles.buttonText} onPress={() => handleAddToCart(item)} />
               </View>
             </View>
           </View>

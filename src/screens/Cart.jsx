@@ -1,60 +1,117 @@
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { COLORS } from '../utils/theme'
 import { moneyFormat } from '../utils/formatter'
 import { API_URL } from '../utils/constants'
 import Button from '../components/Button'
 import BottomTab from '../navigation/BottomTab'
 import { ROUTES } from '../utils/routes'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../features/auth/authSlice'
+import Toast from 'react-native-toast-message'
+import { getCartItems, removeItemFromCart, updateCartQty } from '../services/userApi'
+import { Trash2 } from 'lucide-react-native'
 
 const Cart = ({ navigation }) => {
-    const productData = [
-        {
-            id: 1,
-            title: 'Chimney',
-            price: 12000,
-            oldPrice: 18000,
-            image: 'public/uploads/products/images/PRODUCTS PHOTO 54_page-0017(1).jpg',
-            color: COLORS.COLOR_GREEN,
-        },
-        {
-            id: 2,
-            title: 'Table Fan White',
-            price: 2000,
-            oldPrice: 1000,
-            image: 'public/uploads/products/images/PRODUCTS PHOTO 54_page-0047(1).jpg',
-            color: COLORS.COLOR_GREEN,
-        },
-    ];
+    const { user } = useSelector(selectUser)
+    const [cartItem, setCartItem] = useState([])
+    const [quantity, setQuantity] = useState(1)
+
+    const getCart = async () => {
+        const res = await getCartItems(user?.id)
+        if (res?.status) {
+            setCartItem(res)
+        }
+        else {
+            setCartItem([])
+            Toast.show({
+                type: "error",
+                text2: res?.message,
+                position: "bottom",
+            })
+        }
+    }
+    const handleRemoveItem = async (item) => {
+        const body = {
+            orderId: item?.id,
+            userId: user?.id,
+            productId: item?.productId
+        }
+        const data = await removeItemFromCart(body)
+        if (data?.status) {
+            Toast.show({
+                type: "success",
+                text2: data?.message,
+                position: "bottom",
+            })
+        }
+        getCart()
+    }
+    const updateQty = async (qty, productId) => {
+        const body = {
+            userId: user?.id,
+            productId: productId,
+            quantity: qty
+        }
+        const res = await updateCartQty(body)
+        if (res?.status) {
+            getCart()
+        }
+        else {
+            Toast.show({
+                type: "error",
+                text2: res.message,
+                position: "bottom",
+            })
+        }
+    }
+    const handleAddItems = (qty, id, totalQty) => {
+        if (qty < totalQty) {
+            updateQty(qty + 1, id)
+            setQuantity(quantity + 1)
+        }
+    }
+    const handleMinus = (qty, id) => {
+        if (qty > 1) {
+            updateQty(qty - 1, id)
+            setQuantity(qty - 1)
+        }
+    }
     const Product = ({ item, index, }) => (
         <View style={styles.container}>
-            <View
-                style={styles.item} >
-                <View style={{ flexDirection: 'row', flex: 0.5 }}>
+            <View style={styles.item} >
+                <View style={{ flexDirection: 'row', flex: 0.7, height: '100%', paddingHorizontal: 5 }}>
                     <Image
                         source={{
-                            uri: API_URL + '/' + item?.image,
+                            uri: API_URL + '/' + item?.productImage,
                         }}
                         style={{
                             width: 100,
                             height: 80,
+                            flex: 0.4,
+                            alignSelf: 'center'
                         }}
                     />
-                    <View>
+                    <View style={[styles.details, { flex: 0.6, marginTop: 5 }]}>
                         <Text numberOfLines={2}
-                            style={[styles.titleStyle, { color: COLORS.COLOR_BLACK }]}>
-                            {item?.title}
+                            style={[styles.titleStyle]}>
+                            {item?.productName}
                         </Text>
-                        <Text style={[styles.titleStyle, { color: item?.color }]}>{moneyFormat(item?.price)}</Text>
+                        <Text style={[styles.detailTextStyle]}>{moneyFormat(item?.price)}</Text>
+                        <Text style={[styles.detailTextStyle]}>Total Qty: {item?.totalQuantity}</Text>
                     </View>
                 </View>
-                <View style={{ marginHorizontal: 10, alignSelf: 'flex-start' }}>
-                    <Text style={styles.titleStyle}>Add to Cart</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                        <Button title={'−'} />
-                        <Text style={styles.qtyStyle}>1</Text>
-                        <Button title={'+'} />
+                <View style={{ flex: 0.3, height: '100%', marginTop: 20, marginRight: 5 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-end' }}>
+                        <Button title={'−'} onPress={() => handleMinus(item?.quantity, item?.productId)} />
+                        <Text style={styles.qtyStyle}>{item?.quantity}</Text>
+                        <Button title={'+'} onPress={() => handleAddItems(item?.quantity, item.productId, item?.totalQuantity)} />
                     </View>
+                    <TouchableOpacity onPress={() => handleRemoveItem(item)}
+                        style={styles.removeBtn}>
+                        <Text style={styles.removeBtnText}>Remove </Text>
+                        <Trash2 size={20} color={COLORS.COLOR_RED} />
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>
@@ -68,39 +125,47 @@ const Cart = ({ navigation }) => {
             </View>
         )
     }
-    return (
-        <View style={styles.mainContainer}>
-            <FlatList
-                data={productData}
-                keyExtractor={itm => itm.id}
-                renderItem={({ item, index }) => <Product item={item} idx={index} />}
-                refreshControl={<></>
-                    // <RefreshControl refreshing={isLoading} onRefresh={fetchAllProducts} />
-                }
-            />
-            <View style={styles.btnStyles}>
-                <Amount title={'Sub Total'} price={moneyFormat(1700)} />
-                <Amount title={'Discount'} price={moneyFormat(-300)} color={COLORS.COLOR_GREEN} />
-                <View style={{ marginVertical: 15 }} >
-                    <Amount title={'Total'} price={moneyFormat(1700)} size={18} />
-                </View>
-                <Button title={'PROCEED'} />
-            </View>
-        <BottomTab active={ROUTES.cart} />
 
+    useEffect(() => {
+        getCart()
+    }, [])
+    return (
+        <View style={styles.screenContainer}>
+            <ScrollView style={styles.mainContainer}>
+                <View>
+                    {cartItem?.data?.length > 0 ?
+                        cartItem?.data?.map((item, index) => (
+                            <Product item={item} idx={index} />
+                        )) :
+                        <Text style={[styles.qtyStyle, { marginVertical: 50 }]}>No item in cart</Text>
+                    }
+                    <View style={styles.btnStyles}>
+                        <Amount title={'Sub Total'} price={moneyFormat(cartItem?.totalPrice || 0)}
+                            color={COLORS.COLOR_GREEN} />
+                        <Amount title={'Total Items In Cart'} price={cartItem?.totalItems || 0} />
+                        <View style={{ marginVertical: 15 }} >
+                            <Amount title={'Total'} price={moneyFormat(cartItem?.totalPrice || 0)} size={18} />
+                        </View>
+                        <Button title={'PROCEED'} />
+                    </View>
+                </View>
+            </ScrollView>
+            <BottomTab active={ROUTES.cart} />
         </View>
     )
 }
 
 export default Cart
 const styles = StyleSheet.create({
+    screenContainer: {
+        flex: 1,
+    },
     mainContainer: {
         flex: 1,
     },
     container: {
-        flex: 1,
         height: 100,
-        margin: 15,
+        margin: 10,
         paddingHorizontal: 0,
         flexDirection: 'row',
     },
@@ -112,13 +177,17 @@ const styles = StyleSheet.create({
         alignItems: 'center', justifyContent: 'center'
     },
     titleStyle: {
-        color: COLORS.COLOR_WHITE,
+        fontSize: 14,
         fontWeight: 'bold',
-        fontSize: 15,
+        color: COLORS.COLOR_BLACK,
+        textTransform: 'capitalize'
+    },
+    detailTextStyle: {
+        fontSize: 14,
     },
     item: {
         backgroundColor: COLORS.BACKGROUND_COLOR_LIGHT,
-        width: '100%',
+        flex: 1,
         borderRadius: 8,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -138,5 +207,17 @@ const styles = StyleSheet.create({
     priceContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between'
+    },
+    details: {
+        marginLeft: 10,
+
+    },
+    removeBtn: {
+        margin: 20,
+        alignItems: 'flex-end',
+        flexDirection: 'row'
+    },
+    removeBtnText: {
+        color: COLORS.COLOR_RED
     }
 });

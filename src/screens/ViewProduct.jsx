@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { COLORS } from '../utils/theme';
 import { API_URL, MEDIA_URL } from '../utils/constants';
@@ -6,16 +6,20 @@ import Button from '../components/Button';
 import { moneyFormat } from '../utils/formatter';
 import { Camera, Dot, History, ShieldCheck, Star, Truck } from 'lucide-react-native';
 import { ROUTES } from '../utils/routes';
-import { getProductDetails, getProductReviews, getProductSpecification } from '../services/userApi';
+import { addToCart, getProductDetails, getProductReviews, getProductSpecification } from '../services/userApi';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
+import { selectUser } from '../features/auth/authSlice';
+import { useSelector } from 'react-redux';
 const ViewProduct = ({ route, navigation }) => {
     const { item } = route.params
+    const { user } = useSelector(selectUser)
     const [selectedItem, setSelectedItem] = useState(1)
     const [productDetail, setProductDetail] = useState([])
     const [specifications, setSpecifications] = useState([])
     const [reviews, setReviews] = useState([])
-    const [quantity, setQuantity] = useState(179)
+    const [quantity, setQuantity] = useState(1)
+    const [loading, setLoading] = useState(false)
     const Feature = ({ data }) => (
         <View style={styles.viewStyle}>
             <Dot color={COLORS.COLOR_BLACK} size={30} />
@@ -78,18 +82,20 @@ const ViewProduct = ({ route, navigation }) => {
         </View>
     )
     const getProduct = async () => {
+        setLoading(true)
         const productId = item.id
         const res = await getProductDetails(productId)
-        if (res.status) {
+        if (res?.status) {
             setProductDetail(res?.data[0])
         }
         else {
             Toast.show({
                 type: "error",
-                text2: res.message,
+                text2: res?.message,
                 position: "bottom",
             })
         }
+        setLoading(false)
     }
     const getSpecification = async () => {
         const productId = item?.id
@@ -130,80 +136,110 @@ const ViewProduct = ({ route, navigation }) => {
         }
     }
     const handleMinus = (qty) => {
-        if (quantity > 0)
+        if (quantity > 1)
             setQuantity(quantity - 1)
     }
+    const handleCartButton = async() => {
+        const cartItem = {
+            productId: item.id,
+            quantity: quantity,
+            userId: user?.id
+        }
+        const res= await addToCart(cartItem)
+        if(res.status){
+            Toast.show({
+                type: "success",
+                text1: res.message,
+                position: "bottom",
+            })
+        }
+        else{
+            Toast.show({
+                type: "error",
+                text2: res.message,
+                position: "bottom",
+            })
+        }
+        //  navigation.navigate(ROUTES.cart)
+    }
     return (
-        <View style={styles.container}>
-            <Image
-                source={{
-                    uri: `${API_URL}/${productDetail?.productImage}`,
-                }}
-                style={styles.imageStyle}
-            />
-            <ScrollView style={styles.detailsContainer}>
-                <View style={styles.viewStyle}>
-                    <View style={[styles.gap, { flex: 1 }]}>
-                        <Text style={[styles.titleStyle, { textTransform: 'capitalize' }]}>{productDetail?.productName}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Button title={'−'} onPress={() => handleMinus()} />
-                        <Text style={[styles.titleStyle,
-                        { paddingHorizontal: 10, minWidth: 50, textAlign: 'center' }]}>{quantity}</Text>
-                        <Button title={'+'} onPress={() => handleAddItems(quantity)} />
-                    </View>
+        <>
+            {loading ?
+                <View style={styles.loader}>
+                    <ActivityIndicator size={'large'} color={COLORS.COLOR_RED} />
+                </View> :
+                <View style={styles.container}>
+                    <Image
+                        source={{
+                            uri: `${API_URL}/${productDetail?.productImage}`,
+                        }}
+                        style={styles.imageStyle}
+                    />
+                    <ScrollView style={styles.detailsContainer}>
+                        <View style={styles.viewStyle}>
+                            <View style={[styles.gap, { flex: 1 }]}>
+                                <Text style={[styles.titleStyle, { textTransform: 'capitalize' }]}>{productDetail?.productName}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Button title={'−'} onPress={() => handleMinus()} />
+                                <Text style={[styles.titleStyle,
+                                { paddingHorizontal: 10, minWidth: 50, textAlign: 'center' }]}>{quantity}</Text>
+                                <Button title={'+'} onPress={() => handleAddItems(quantity)} />
+                            </View>
 
-                </View>
+                        </View>
 
-                <View style={[styles.viewStyle, styles.gap]}>
-                    <Text style={[styles.titleStyle]}>{moneyFormat(productDetail?.price)}</Text>
-                    <Text style={{
-                        color: COLORS.COLOR_RED,
-                        textDecorationLine: 'line-through',
-                        margin: 5
-                    }}>{moneyFormat(productDetail?.oldPrice)}</Text>
-                </View>
-                <Text>Items Left : {productDetail?.quantity}</Text>
-                <Text style={{ textTransform: 'capitalize' }}>{productDetail?.details}</Text>
-                <View style={styles.line} />
-                <View style={[styles.viewStyle, { justifyContent: 'space-around' }]}>
-                    <View style={styles.align}>
-                        <ShieldCheck color={COLORS.COLOR_RED} size={30} />
-                        <Text style={styles.subTitle}>{productDetail?.warrantyUpto} Year Warranty</Text>
-                    </View>
-                    {productDetail?.freeDelivery == 1 && <View style={styles.align}>
-                        <Truck color={COLORS.COLOR_RED} size={30} />
-                        <Text style={styles.subTitle}>{' Free Delivery'} </Text>
-                    </View>}
-                    <View style={styles.align}>
-                        <History color={COLORS.COLOR_RED} size={30} />
-                        <Text style={styles.subTitle}>{productDetail?.replacementUpto} Days Replacement</Text>
-                    </View>
-                </View>
-                <View style={styles.line} />
-                <View style={[styles.viewStyle]}>
-                    <TouchableOpacity onPress={() => setSelectedItem(1)}>
-                        <Text style={[selectedItem == 1 && { color: COLORS.COLOR_RED }]}>Features</Text>
-                        {selectedItem == 1 && <View style={styles.borderLine} />}
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setSelectedItem(2)}>
-                        <Text style={[styles.detailBox, selectedItem == 2 && { color: COLORS.COLOR_RED }]}>Specifications</Text>
-                        {selectedItem == 2 && <View style={styles.borderLine} />}
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setSelectedItem(3)}>
-                        <Text style={[styles.detailBox, selectedItem == 3 && { color: COLORS.COLOR_RED }]}>Reviews</Text>
-                        {selectedItem == 3 && <View style={styles.borderLine} />}
-                    </TouchableOpacity>
+                        <View style={[styles.viewStyle, styles.gap]}>
+                            <Text style={[styles.titleStyle]}>{moneyFormat(productDetail?.price)}</Text>
+                            <Text style={{
+                                color: COLORS.COLOR_RED,
+                                textDecorationLine: 'line-through',
+                                margin: 5
+                            }}>{moneyFormat(productDetail?.oldPrice)}</Text>
+                        </View>
+                        <Text>Items Left : {productDetail?.quantity}</Text>
+                        <Text style={{ textTransform: 'capitalize' }}>{productDetail?.details}</Text>
+                        <View style={styles.line} />
+                        <View style={[styles.viewStyle, { justifyContent: 'space-around' }]}>
+                            <View style={styles.align}>
+                                <ShieldCheck color={COLORS.COLOR_RED} size={30} />
+                                <Text style={styles.subTitle}>{productDetail?.warrantyUpto} Year Warranty</Text>
+                            </View>
+                            {productDetail?.freeDelivery == 1 && <View style={styles.align}>
+                                <Truck color={COLORS.COLOR_RED} size={30} />
+                                <Text style={styles.subTitle}>{' Free Delivery'} </Text>
+                            </View>}
+                            <View style={styles.align}>
+                                <History color={COLORS.COLOR_RED} size={30} />
+                                <Text style={styles.subTitle}>{productDetail?.replacementUpto} Days Replacement</Text>
+                            </View>
+                        </View>
+                        <View style={styles.line} />
+                        <View style={[styles.viewStyle]}>
+                            <TouchableOpacity onPress={() => setSelectedItem(1)}>
+                                <Text style={[selectedItem == 1 && { color: COLORS.COLOR_RED }]}>Features</Text>
+                                {selectedItem == 1 && <View style={styles.borderLine} />}
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setSelectedItem(2)}>
+                                <Text style={[styles.detailBox, selectedItem == 2 && { color: COLORS.COLOR_RED }]}>Specifications</Text>
+                                {selectedItem == 2 && <View style={styles.borderLine} />}
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setSelectedItem(3)}>
+                                <Text style={[styles.detailBox, selectedItem == 3 && { color: COLORS.COLOR_RED }]}>Reviews</Text>
+                                {selectedItem == 3 && <View style={styles.borderLine} />}
+                            </TouchableOpacity>
 
+                        </View>
+                        {selectedItem == 1 && <Feature data={productDetail?.features} />}
+                        {selectedItem == 2 && <Specification data={specifications} />}
+                        {selectedItem == 3 && <Review data={reviews} />}
+                    </ScrollView>
+                    <View style={{ margin: 10 }}>
+                        <Button title={'ADD TO CART'} onPress={handleCartButton} />
+                    </View>
                 </View>
-                {selectedItem == 1 && <Feature data={productDetail?.features} />}
-                {selectedItem == 2 && <Specification data={specifications} />}
-                {selectedItem == 3 && <Review data={reviews} />}
-            </ScrollView>
-            <View style={{ margin: 10 }}>
-                <Button title={'ADD TO CART'} onPress={() => navigation.navigate(ROUTES.cart)} />
-            </View>
-        </View>
+            }
+        </>
     )
 }
 
@@ -283,6 +319,11 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         marginRight: 10,
         borderWidth: 1,
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 export default ViewProduct
