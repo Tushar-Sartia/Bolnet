@@ -20,4 +20,5 @@ productRouter.post('/productSpecification', verifyToken, productSpecification);
 //product reviews
 productRouter.get('/getProductReviews/:productId', verifyToken, getProductReview);
 productRouter.post('/productReviews', verifyToken, productReviews);
+productRouter.post('/productReviews', verifyToken, productReviews);
 

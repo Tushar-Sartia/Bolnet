@@ -158,3 +158,21 @@ export const getProductReview = async (req, res) => {
         return res.status(500).json({ message: err.message, status: false })
     }
 }
+export const addPopularProduct = async (req, res) => {
+    try {
+        const { productId } = req.params
+        const getProductQuery = `SELECT product_reviews.*,users.image,users.name 
+        FROM product_reviews
+        LEFT JOIN users ON product_reviews.userId=users.id
+        WHERE productId=${productId}`
+        const results = await db.query(getProductQuery)
+        if (results.length > 0) {
+            return res.status(200).json({ data: results, status: true })
+        }
+        else {
+            return res.status(404).json({ message: 'error', status: false })
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message, status: false })
+    }
+}

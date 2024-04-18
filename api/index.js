@@ -5,6 +5,7 @@ import { makeDb } from "./db.js";
 import { userRouter } from "./router/User.routes.js";
 import { productRouter } from "./router/product.routes.js";
 import { cartRouter } from "./router/cart.router.js";
+import { orderRouter } from "./router/order.Route.js";
 // import { userRouter } from "./router/User.routes.js";
 // import { productRouter } from "./router/Product.routes.js";
 // import { cartRouter } from "./router/Cart.router.js";
@@ -20,7 +21,7 @@ app.use(express.static('uploads'))
 app.use('/user', userRouter);
 app.use('/product', productRouter);
 app.use('/cart', cartRouter);
-// app.use('/category', categoryRoute);
+app.use('/order', orderRouter);
 
 
 app.listen(PORT, () => {
