@@ -71,6 +71,17 @@ export const registerInvestor = async body => {
     };
   }
 };
+export const getPopularProducts = async () => {
+  try {
+    const { data } = await customApi.get(`/product/popularProducts`);
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
 export const getAllProducts = async () => {
   try {
     const { data } = await customApi.get(`/product/`);
@@ -159,8 +170,17 @@ export const updateCartQty = async (body) => {
     }
   }
 }
-
-
+export const placeOrder = async (body) => {
+  try {
+    const { data } = await customApi.post(`/order/placeOrder`, body)
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    }
+  }
+}
 
 export const updateInvesterPassword = async values => {
   try {

@@ -12,11 +12,10 @@ import { API_URL, MEDIA_URL } from '../utils/constants';
 import { ROUTES } from '../utils/routes';
 import { moneyFormat } from '../utils/formatter';
 const PopularProduct = ({ item, idx, navigation }) => {
-    const updatedImagePath = item?.image?.replace('public/', '');
     const handleProductImageClick = item => {
         navigation.navigate(ROUTES.viewProduct);
     };
-
+    console.log(item)
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -28,29 +27,27 @@ const PopularProduct = ({ item, idx, navigation }) => {
                     justifyContent: 'space-around',
                     alignItems: 'center'
                 }} onPress={() => navigation.navigate('ViewProduct', { item: item })}>
-                <Image
-                    source={{
-                        uri: MEDIA_URL + '/' + updatedImagePath,
-                    }}
-                    style={{
-                        width: 80,
-                        height: 60,
-                        resizeMode: 'contain',
-                    }}
-                />
-                <View>
-                    <Text
+                <View style={{ flex: 0.7, alignItems: 'center' }}>
+                    <Image
+                        source={{
+                            uri: API_URL + '/' + item?.productImage,
+                        }}
                         style={{
-                            color: COLORS.BACKGROUND_COLOR_DARK,
-                            fontWeight: 'bold',
-                            fontSize: 18,
-                        }}>
-                        {item.title}
+                            width: 80,
+                            height: '80%',
+                            resizeMode: 'cover',
+                        }}
+                    />
+                </View>
+                <View style={{ flex: 1, alignSelf: 'flex-start', marginTop: 5 }}>
+                    <Text
+                        style={styles.titleStyle}>
+                        {item.productName}
                     </Text>
-                    <Text style={[styles.titleStyle, { color: item?.color }]}>{moneyFormat(item?.price)}</Text>
+                    <Text>{moneyFormat(item?.price)}</Text>
                 </View>
                 <View style={styles.cartBtn}>
-                    <Text style={[styles.titleStyle,]}>Add to Cart</Text>
+                    <Text style={[styles.titleStyle, { color: COLORS.COLOR_WHITE }]}>Add to Cart</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -63,16 +60,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     cartBtn: {
+        flex:0.7,
+        marginRight:10,
         height: 40,
         borderRadius: 10,
-        width: 100,
         backgroundColor: COLORS.PRIMARY_COLOR,
-        alignItems: 'center', justifyContent: 'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     titleStyle: {
-        color: COLORS.COLOR_WHITE,
+        color:COLORS.COLOR_BLACK,
         fontWeight: 'bold',
         fontSize: 15,
+        textTransform: 'capitalize'
     }
 });
 export default PopularProduct;

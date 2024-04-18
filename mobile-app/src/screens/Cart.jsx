@@ -9,14 +9,16 @@ import { ROUTES } from '../utils/routes'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../features/auth/authSlice'
 import Toast from 'react-native-toast-message'
-import { getCartItems, removeItemFromCart, updateCartQty } from '../services/userApi'
+import { getCartItems, placeOrder, removeItemFromCart, updateCartQty } from '../services/userApi'
 import { Trash2 } from 'lucide-react-native'
 
 const Cart = ({ navigation }) => {
     const { user } = useSelector(selectUser)
     const [cartItem, setCartItem] = useState([])
     const [quantity, setQuantity] = useState(1)
-
+    const [order, setOrder] = useState([]);
+    const [shippingAddress, setShippingAddress] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('cash');
     const getCart = async () => {
         const res = await getCartItems(user?.id)
         if (res?.status) {
@@ -125,7 +127,40 @@ const Cart = ({ navigation }) => {
             </View>
         )
     }
+    const handleProceed = async () => {
+        const productsToAdd = cartItem?.data?.map((item) => ({
+            price: item?.price,
+            quantity: item?.quantity,
+            productId: item?.productId,
+            productName: item?.productName
+        }));
 
+        setOrder(productsToAdd);
+        const payload = {
+            userId: user?.id,
+            items: order,
+            totalPrice: cartItem?.totalPrice,
+            shippingAddress: shippingAddress,
+            paymentMethod: paymentMethod
+        }
+        const placeOrderRes = await placeOrder(payload)
+        if (placeOrderRes?.status) {
+            Toast.show({
+                type: "success",
+                text1: placeOrderRes?.message,
+                position: "bottom",
+            })
+            getCart()
+            setOrder([])
+        }
+        else {
+            Toast.show({
+                type: "error",
+                text1: placeOrderRes?.message,
+                position: "bottom",
+            })
+        }
+    }
     useEffect(() => {
         getCart()
     }, [])
@@ -146,7 +181,7 @@ const Cart = ({ navigation }) => {
                         <View style={{ marginVertical: 15 }} >
                             <Amount title={'Total'} price={moneyFormat(cartItem?.totalPrice || 0)} size={18} />
                         </View>
-                        <Button title={'PROCEED'} />
+                        <Button title={'PROCEED'} onPress={handleProceed} />
                     </View>
                 </View>
             </ScrollView>
