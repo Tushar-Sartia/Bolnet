@@ -32,8 +32,8 @@ const ViewProduct = ({ route, navigation }) => {
     const Specification = ({ data }) => (
         <View>
             <View style={styles.viewStyle}>
-                <Text style={[styles.textStyle]}>Product Dimensions:</Text>
-                <Text style={[styles.textStyle]}>{data?.productDimensions}</Text>
+                <Text style={styles.textStyle}>Product Dimensions:</Text>
+                <Text style={styles.textStyle}>{data?.productDimensions}</Text>
             </View>
             <View style={styles.viewStyle}>
                 <Text style={styles.textStyle}>Color:</Text>
@@ -56,13 +56,12 @@ const ViewProduct = ({ route, navigation }) => {
     };
     const Review = ({ data }) => (
         <View style={{ marginBottom: 50 }}>
-            {data.map((item, index) => (
+            {data?.map((item, index) => (
                 <View style={styles.reviewContainer} key={index}>
                     <View style={styles.viewStyle}>
-
                         <Image
                             source={{
-                                uri: `${API_URL}/${item?.image}`,
+                                uri: `${API_URL}/${item?.attachments}`,
                             }}
                             style={styles.imageIcon}
                         />
@@ -168,10 +167,10 @@ const ViewProduct = ({ route, navigation }) => {
                 <View style={styles.loader}>
                     <ActivityIndicator size={'large'} color={COLORS.COLOR_RED} />
                 </View> :
-                <View style={styles.container}>
+                <View style={styles.container}>{console.log(productDetail)}
                     <Image
                         source={{
-                            uri: `${API_URL}/${productDetail?.productImage}`,
+                            uri: `${API_URL}/${productDetail?.attachments}`,
                         }}
                         style={styles.imageStyle}
                     />

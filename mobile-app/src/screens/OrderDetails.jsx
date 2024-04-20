@@ -3,6 +3,7 @@ import React from 'react'
 import { ROUTES } from '../utils/routes'
 import { COLORS } from '../utils/theme'
 import { getColor, moneyFormat } from '../utils/formatter'
+import moment from 'moment'
 
 const OrderDetails = ({ route, navigation }) => {
     const { order } = route?.params
@@ -11,46 +12,40 @@ const OrderDetails = ({ route, navigation }) => {
             <View style={{ flex: 1 }}>
                 <View style={styles.viewStyle}>
                     <View>
-                        <Text style={styles.textStyle}>#{order.orderId}</Text>
-                        <Text style={styles.contentStyle}>{order.updatedOn}</Text>
+                        <Text style={styles.textStyle}>Order ID: #{order.orderId}</Text>
+                        <Text style={styles.contentStyle}>{order?.updated_at ? moment(order?.updated_at).format('DD MMM YYYY') :
+                            moment(order?.orderDate).format('DD MMM YYYY')}</Text>
                     </View>
                     <View>
-                        <Text style={[styles.textStyle, { color: getColor(order?.status) }]}>{order?.status}</Text>
+                        <Text style={[styles.textStyle, { color: getColor(order?.status) }]}>{order?.orderStatus}</Text>
 
                     </View>
                 </View>
 
                 <View style={styles.marginStyle}>
                     <Text style={styles.textStyle}>Delivered to</Text>
-                    <Text style={styles.contentStyle}>{order.address}</Text>
+                    <Text style={styles.contentStyle}>{order?.shippingAddress}</Text>
                 </View>
-                <View style={styles.marginStyle}>
+                <View style={[styles.marginStyle, styles.viewStyle]}>
                     <Text style={styles.textStyle}>Payment Method</Text>
-                    <Text style={styles.contentStyle}>{order.paymentMode}</Text>
+                    <Text style={styles.contentStyle}>{order.paymentMethod}</Text>
                 </View>
-                <Text style={styles.contentStyle}>Tracking Id : #0987PQ12</Text>
-                 <Text style={styles.contentStyle}>Expected Delivery By: 12-04-2024</Text>
-
-                <View style={styles.line} />
                 <View style={styles.viewStyle}>
-                    <View>
-                        <Text style={styles.textStyle}>{order.title} x {order.qty}</Text>
-                        <Text style={styles.contentStyle}>({moneyFormat(order.price)})</Text>
-                    </View>
-                    <Text style={[styles.textStyle]}>{moneyFormat(order?.price * (order?.qty || 1))}</Text>
+                    <Text style={styles.contentStyle}>Tracking Id : #{order.orderId}</Text>
                 </View>
+                <View style={styles.line} />
+                {order?.items.map((item) => <View style={styles.viewStyle}>
+                    <View>
+                        <Text style={styles.textStyle}>{item?.productName} x {item?.orderedQuantity}</Text>
+                        <Text style={styles.contentStyle}>({moneyFormat(item.price)})</Text>
+                    </View>
+                    <Text style={[styles.textStyle]}>{moneyFormat(item?.subtotal)}</Text>
+                </View>)}
             </View>
             <View style={styles.line} />
             <View style={styles.viewStyle}>
-                <View>
-                    <Text style={styles.contentStyle}>Item Total</Text>
-                    <Text style={styles.textStyle}>Total Amount</Text>
-                </View>
-                <View>
-                    <Text style={[styles.contentStyle]}>{moneyFormat(order?.price * (order?.qty || 1))}</Text>
-                    <Text style={[styles.textStyle]}>{moneyFormat(order?.totalPrice)}</Text>
-
-                </View>
+                <Text style={styles.textStyle}>Total Amount</Text>
+                <Text style={styles.textStyle}>{moneyFormat(order?.totalPrice)}</Text>
             </View>
 
         </View>
@@ -80,6 +75,7 @@ const styles = StyleSheet.create({
     },
     contentStyle: {
         flexWrap: 'wrap',
+        textTransform: 'capitalize',
         color: COLORS.COLOR_BLACK
     },
     marginStyle: {

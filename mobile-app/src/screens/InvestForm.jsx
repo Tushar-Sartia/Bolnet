@@ -23,7 +23,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../features/auth/authSlice';
 import DocumentPicker from 'react-native-document-picker';
-import { getAdminDetails, investFormApi } from '../services/userApi';
+import { getInvestorBankDetails, investFormApi } from '../services/userApi';
 import {
   PERMISSIONS,
   checkMultiple,
@@ -34,10 +34,6 @@ import { API_URL } from '../utils/constants';
 
 const InvestForm = () => {
   const { user } = useSelector(selectUser);
-  const [adminDetails, setAdminDetails] = useState([]);
-  const allData = adminDetails.map(e => e.value);
-
-  // const [minAmount, setAmount] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [width, setWidth] = useState(70);
@@ -45,6 +41,7 @@ const InvestForm = () => {
   const [singleFile, setSingleFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const sheetRef = useRef('');
+  const [bankData, setBankData] = useState([])
 
   const askMediPermission = async () => {
     if (Platform.OS === 'android') {
@@ -72,8 +69,10 @@ const InvestForm = () => {
       type: 'image/jpeg',
     });
     bodyFormData.append('points', quantity);
-    bodyFormData.append('amount', quantity * allData[4] || 0);
+    bodyFormData.append('amount', quantity * bankData?.investment_amount || 0);
+    console.log(bodyFormData)
     const res = await investFormApi(bodyFormData);
+    console.log(res)
     if (res.status) {
       Toast.show({
         type: 'success',
@@ -95,21 +94,31 @@ const InvestForm = () => {
   const data = [
     {
       text: 'Bank Name',
-      value: allData[6],
+      value: bankData.bank_name
     },
     {
-      text: 'Accounr Holder Name',
-      value: allData[9],
+      text: 'Account Holder Name',
+      value: bankData.account_holder_name
     },
     {
       text: 'Account Number',
-      value: allData[7],
+      value: bankData.account_number,
     },
     {
-      text: 'Ifsc',
-      value: allData[8],
+      text: 'IFSC',
+      value: bankData.ifsc,
     },
   ];
+  const fetchInvestorBankDetails = async () => {
+
+    const data = await getInvestorBankDetails()
+    if (data.status) {
+      setBankData(data.data[0])
+    }
+    else {
+      console.log('Error:')
+    }
+  }
   const handleImagePicker = async () => {
     askMediPermission();
     const statuses = await checkMultiple([PERMISSIONS.ANDROID.CAMERA]);
@@ -228,17 +237,8 @@ const InvestForm = () => {
       text1: 'Please upload Signed Agreement',
     });
   };
-  const fetchAdminDetails = async () => {
-    const res = await getAdminDetails();
-    if (res.status) {
-      setAdminDetails(res.data);
-    } else {
-      setAdminDetails([]);
-    }
-  };
-
   useEffect(() => {
-    fetchAdminDetails();
+    fetchInvestorBankDetails()
   }, []);
 
   return (
@@ -247,13 +247,13 @@ const InvestForm = () => {
         <View style={styles.detailContainer}>
           <Text style={styles.titleText}>Investment Amount</Text>
           <Text style={[styles.titleText, styles.valueText]}>
-            {moneyFormat(quantity * allData[4] || 0)}
+            {moneyFormat(quantity * bankData?.investment_amount || 0)}
           </Text>
         </View>
         <View style={styles.detailContainer}>
           <Text style={styles.titleText}>Lock in period</Text>
           <Text style={[styles.titleText, styles.valueText]}>
-            {allData[5]} months
+            {bankData?.lock_in_period} months
           </Text>
         </View>
         <View style={{ marginVertical: 20, paddingHorizontal: 10 }}>

@@ -12,10 +12,7 @@ import { API_URL, MEDIA_URL } from '../utils/constants';
 import { ROUTES } from '../utils/routes';
 import { moneyFormat } from '../utils/formatter';
 const PopularProduct = ({ item, idx, navigation }) => {
-    const handleProductImageClick = item => {
-        navigation.navigate(ROUTES.viewProduct);
-    };
-    console.log(item)
+   
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -30,7 +27,7 @@ const PopularProduct = ({ item, idx, navigation }) => {
                 <View style={{ flex: 0.7, alignItems: 'center' }}>
                     <Image
                         source={{
-                            uri: API_URL + '/' + item?.productImage,
+                            uri: API_URL + '/' + item?.attachments,
                         }}
                         style={{
                             width: 80,
@@ -45,6 +42,7 @@ const PopularProduct = ({ item, idx, navigation }) => {
                         {item.productName}
                     </Text>
                     <Text>{moneyFormat(item?.price)}</Text>
+                    <Text>Sold: {item?.quantitySold}</Text>
                 </View>
                 <View style={styles.cartBtn}>
                     <Text style={[styles.titleStyle, { color: COLORS.COLOR_WHITE }]}>Add to Cart</Text>

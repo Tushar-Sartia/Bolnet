@@ -1,5 +1,5 @@
 import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { COLORS } from '../utils/theme';
 import { Package } from 'lucide-react-native';
 import { getColor, moneyFormat } from '../utils/formatter';
@@ -7,80 +7,85 @@ import { API_URL } from '../utils/constants';
 import Button from '../components/Button';
 import BottomTab from '../navigation/BottomTab';
 import { ROUTES } from '../utils/routes';
+import { getAllOrders } from '../services/userApi';
+import { useIsFocused } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../features/auth/authSlice';
+import Toast from 'react-native-toast-message';
+import moment from 'moment';
 
 const Order = ({ navigation }) => {
-    const productData = [
-        {
-            id: 1,
-            orderId: '2233BOL21',
-            status: 'In-Transit',
-            updatedOn: '12-04-2024',
-            title: 'Chimney',
-            qty: 1,
-            price: 12000,
-            totalPrice: 12000,
-            paymentMode: 'Paid by PhonePe',
-            image: 'public/uploads/products/images/PRODUCTS PHOTO 54_page-0017(1).jpg',
-            address: '1663,Mayur vihar Colony, Sector-15, Noida'
-        },
-        {
-            id: 2,
-            orderId: '2233BOL22',
-            status: 'Delivered',
-            updatedOn: '12-04-2024',
-            title: 'Tabel Fan',
-            qty: 2,
-            price: 5000,
-            totalPrice: 10000,
-            paymentMode: 'Cash on Delivery',
-            image: 'public/uploads/products/images/PRODUCTS PHOTO 54_page-0047(1).jpg',
-            address: '1663,Mayur vihar Colony, Sector-15, Noida'
-        }
-    ];
+    const { user } = useSelector(selectUser)
+    const [order, setOrders] = useState([])
+    const isFocused = useIsFocused()
 
-    const MyOrders = ({ item }) => (
-        <View style={styles.itemContainer}>
-            <Text style={styles.textStyle}>Order ID: <Text style={{ color: COLORS.COLOR_RED }}>{item.orderId}</Text></Text>
+    const getmyOrders = async () => {
+        const res = await getAllOrders(user?.id)
+        if (res?.status) {
+            setOrders(res?.data)
+        }
+        else {
+            setOrders([])
+            Toast.show({
+                type: "error",
+                text2: res?.message,
+                position: "bottom",
+            })
+        }
+    }
+    useEffect(() => {
+        getmyOrders()
+    }, [isFocused])
+    const MyOrders = ({ item, index }) => (
+        <View style={styles.itemContainer} key={index}>
+            <Text style={styles.textStyle}>Order ID: <Text style={{ color: COLORS.COLOR_RED }}>#{item?.orderId}</Text></Text>
             <View style={styles.line} />
             <View style={styles.viewStyle}>
-                <View style={[styles.statusContainer, { borderColor: getColor(item?.status) }]}>
-                    <Package size={20} color={getColor(item?.status)} />
-                    <Text style={[styles.textStyle, { color: getColor(item.status) }]}>{' '}{item?.status}</Text>
+                <View style={[styles.statusContainer, { borderColor: getColor(item?.orderStatus) }]}>
+                    <Package size={20} color={getColor(item?.orderStatus)} />
+                    <Text style={[styles.textStyle,
+                    { color: getColor(item.orderStatus) }]}>{' '}{item?.orderStatus}</Text>
 
                 </View>
                 <View style={{ flex: 0.6, alignItems: 'flex-end' }}>
-                    <Text style={[styles.dateStyle, { color: COLORS.COLOR_GRAY }]}>Status Updated On:
+                    <Text style={[styles.dateStyle, { color: COLORS.COLOR_GRAY }]}>{item?.orderStatus == 'In-Transit' ? "Ordered On" : "Updated On"}
                     </Text>
-                    <Text style={styles.dateStyle}>{item?.updatedOn}</Text>
+                    <Text style={styles.dateStyle}>{item?.orderStatus == 'In-Transit' ?
+                        moment(item?.orderDate).format('DD/MM/YYYY')
+                        : moment(item?.updatedOn).format('DD/MM/YYYY')}</Text>
 
                 </View>
             </View>
             <View style={styles.line} />
-            <View style={styles.viewStyle}>
-                <View style={[styles.viewStyle, { flex: 0.5 }]}>
-                    <Image
-                        source={{
-                            uri: API_URL + '/' + item?.image,
-                        }}
-                        style={{
-                            width: 80,
-                            height: 60,
-                            resizeMode: 'contain',
-                        }}
-                    />
-                    <View style={{}}>
-                        <Text style={styles.textStyle} numberOfLines={2}>{' '}
-                            {item?.title}</Text>
-                        <Text >{' '}{moneyFormat(item?.price)}/p</Text>
+            {item?.items?.map((data) => (
+
+                <View style={styles.viewStyle}>
+                    <View style={[styles.viewStyle, { flex: 0.5 }]}>{console.log(data)}
+                        <Image
+                            source={{
+                                uri: API_URL + '/' + data?.image,
+                            }}
+                            style={{
+                                width: 80,
+                                height: 60,
+                                marginVertical: 5,
+                                resizeMode: 'cover',
+                            }}
+                        />
+                        <View>
+                            <Text style={styles.textStyle} numberOfLines={2}>{' '}
+                                {data?.productName}</Text>
+                            <Text >{' '}{moneyFormat(data?.price)}/p</Text>
+                        </View>
+                    </View>
+                    <View style={{ flex: 0.4, alignItems: 'flex-end' }}>
+                        <Text style={styles.dateStyle}>Qty:{data?.orderedQuantity}</Text>
+                        <Text style={[styles.textStyle, { color: COLORS.COLOR_GREEN }]}>
+                            {moneyFormat(data?.subtotal)}
+                        </Text>
                     </View>
                 </View>
-                <View style={{ flex: 0.4, alignItems: 'flex-end' }}>
-                    <Text style={styles.dateStyle}>Qty:{item.qty}</Text>
-                    <Text style={[styles.textStyle, { color: COLORS.COLOR_GREEN }]}>
-                        {moneyFormat(item?.totalPrice)}
-                    </Text>
-                </View>
-            </View>
+            ))}
             <View style={[styles.margins, styles.viewStyle, { justifyContent: 'space-around' }]}>
                 <Pressable style={[styles.cartBtn, { backgroundColor: COLORS.COLOR_WHITE }]}
                     onPress={() => navigation.navigate(ROUTES.orderDetails, {
@@ -99,9 +104,9 @@ const Order = ({ navigation }) => {
     return (
         <>
             <FlatList
-                data={productData}
+                data={order}
                 keyExtractor={itm => itm.id}
-                renderItem={({ item, index }) => <MyOrders item={item} idx={index} />}
+                renderItem={({ item, index }) => <MyOrders item={item} index={index} />}
                 refreshControl={<></>
                     // <RefreshControl refreshing={isLoading} onRefresh={fetchAllProducts} />
                 }

@@ -45,17 +45,17 @@ const ProductCard = ({ item, idx, navigation }) => {
             }}>
             <View style={styles.imageContainer}>
               <Image
-                source={{ uri: API_URL + '/' + item?.productImage }}
+                source={{ uri: API_URL + '/' + item?.attachments }}
                 style={styles.image}
               />
               <View style={styles.detailsContainer}>
                 <Text style={styles.name} numberOfLines={1}>{item.productName}</Text>
                 <View style={styles.nameContainer}>
                   <Text style={[styles.name]} numberOfLines={1}>{moneyFormat(item.price).split('.00')}</Text>
-                  <Text style={[styles.oldPrice, { textDecorationLine: 'line-through' }]}>{moneyFormat(item?.oldPrice).split('.00')}</Text>
-                  {item?.discount &&
-                    <Text style={[styles.oldPrice]} numberOfLines={2}>({item?.discount}% off)</Text>
-                  }</View>
+                  <Text style={[styles.oldPrice, { textDecorationLine: 'line-through' }]}>
+                    {moneyFormat(item?.oldPrice).split('.00')}</Text>
+                  {item?.discount?<Text style={[styles.oldPrice]} numberOfLines={2}>({item?.discount}% off)</Text>:<></>}
+                </View>
               </View>
               <View style={styles.buttonContainer}>
                 <Button title={'Add to Cart'} textStyle={styles.buttonText} onPress={() => handleAddToCart(item)} />

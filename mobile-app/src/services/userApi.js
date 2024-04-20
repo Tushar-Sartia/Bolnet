@@ -73,7 +73,7 @@ export const registerInvestor = async body => {
 };
 export const getPopularProducts = async () => {
   try {
-    const { data } = await customApi.get(`/product/popularProducts`);
+    const { data } = await customApi.get(`/product/popularProduct`);
     return data;
   } catch (error) {
     return {
@@ -181,7 +181,30 @@ export const placeOrder = async (body) => {
     }
   }
 }
+export const getAllOrders = async (userId) => {
+  try {
+    const { data } = await customApi.get(`/order/getAllOrder/${userId}`)
+    return data;
+  } catch (error) {
 
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    }
+  }
+}
+
+export const getInvestorBankDetails = async values => {
+  try {
+    const { data } = await customApi.get(`/investment/getInvestorBank`, values);
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
 export const updateInvesterPassword = async values => {
   try {
     const { data } = await customApi.post(`/user/changePassword`, values);
@@ -272,7 +295,7 @@ export const updateProfile = async values => {
 };
 export const investFormApi = async values => {
   try {
-    const { data } = await customApi.post('/investor_invest', values, {
+    const { data } = await customApi.post('/investment/invest', values, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -322,17 +345,7 @@ export const getInvestmentHistory = async id => {
     };
   }
 };
-export const getAdminDetails = async () => {
-  try {
-    const { data } = await customApi.get(`/admin_details`,);
-    return data;
-  } catch (error) {
-    return {
-      status: false,
-      message: error?.response?.data?.message || error?.message,
-    };
-  }
-};
+
 export const getWalletDataApi = async id => {
   try {
     const { data } = await customApi.get(`/investment_history/${id}`);

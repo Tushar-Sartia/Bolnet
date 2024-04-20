@@ -16,8 +16,7 @@ const Cart = ({ navigation }) => {
     const { user } = useSelector(selectUser)
     const [cartItem, setCartItem] = useState([])
     const [quantity, setQuantity] = useState(1)
-    const [order, setOrder] = useState([]);
-    const [shippingAddress, setShippingAddress] = useState('');
+    const [shippingAddress, setShippingAddress] = useState('Sartia Global ,noida sector-6,266234');
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const getCart = async () => {
         const res = await getCartItems(user?.id)
@@ -26,11 +25,6 @@ const Cart = ({ navigation }) => {
         }
         else {
             setCartItem([])
-            Toast.show({
-                type: "error",
-                text2: res?.message,
-                position: "bottom",
-            })
         }
     }
     const handleRemoveItem = async (item) => {
@@ -85,7 +79,7 @@ const Cart = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', flex: 0.7, height: '100%', paddingHorizontal: 5 }}>
                     <Image
                         source={{
-                            uri: API_URL + '/' + item?.productImage,
+                            uri: API_URL + '/' + item?.attachments,
                         }}
                         style={{
                             width: 100,
@@ -135,10 +129,9 @@ const Cart = ({ navigation }) => {
             productName: item?.productName
         }));
 
-        setOrder(productsToAdd);
         const payload = {
             userId: user?.id,
-            items: order,
+            items: productsToAdd,
             totalPrice: cartItem?.totalPrice,
             shippingAddress: shippingAddress,
             paymentMethod: paymentMethod
@@ -151,7 +144,6 @@ const Cart = ({ navigation }) => {
                 position: "bottom",
             })
             getCart()
-            setOrder([])
         }
         else {
             Toast.show({

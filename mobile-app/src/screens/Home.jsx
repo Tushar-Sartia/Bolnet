@@ -10,11 +10,12 @@ import { selectUser } from '../features/auth/authSlice';
 import { ROUTES } from '../utils/routes';
 import ProductCard from '../components/ProductCard';
 import PopularProduct from '../components/PopularProduct';
+import { useIsFocused } from '@react-navigation/native';
 const Home = ({ navigation }) => {
   const { user } = useSelector(selectUser);
   const [data, setData] = useState([]);
   const [popularProducts, setPopularProducts] = useState([])
-
+  const isFocused = useIsFocused()
   const fetchPopularProducts = async (req, res) => {
     const popularProductRes = await getPopularProducts()
     if (popularProductRes?.status) {
@@ -65,7 +66,7 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     fetchAllData();
     fetchPopularProducts()
-  }, []);
+  }, [isFocused]);
 
   return (
     <>
