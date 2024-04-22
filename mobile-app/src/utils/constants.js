@@ -1,4 +1,5 @@
-export const API_URL = 'http://192.168.1.34:3000';
+export const API_URL = 'http://192.168.1.34:3000/api';
+export const MEDIA_URL = 'http://192.168.1.34:3000';
 // export const API_URL = 'http://bolnet-shopping-update.thewingshield.com';
 
 // export const MEDIA_URL =

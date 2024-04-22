@@ -3,9 +3,7 @@ import * as Yup from 'yup';
 const phoneRegExp = /^[6-9]{1}[0-9]{9}$/;
 
 export const loginSchema = Yup.object().shape({
-  phone: Yup.string()
-    .matches(phoneRegExp, 'Phone number is not valid')
-    .required('Phone is Required'),
+  email: Yup.string().email('Invalid Email').required('Email is Required'),
   password: Yup.string()
     .min(6, 'Atleast 6 charactor!!')
     .required('Password is required!!'),

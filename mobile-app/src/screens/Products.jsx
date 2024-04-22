@@ -13,7 +13,9 @@ import ProductCard from '../components/ProductCard';
 import { getAllProducts } from '../services/userApi';
 import BottomTab from '../navigation/BottomTab';
 import { ROUTES } from '../utils/routes';
+import { useIsFocused } from '@react-navigation/native';
 const Products = ({ navigation }) => {
+  const isFocused = useIsFocused()
   const [allProducts, setAllProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const fetchAllProducts = async () => {
@@ -26,7 +28,7 @@ const Products = ({ navigation }) => {
   };
   useEffect(() => {
     fetchAllProducts();
-  }, []);
+  }, [isFocused]);
 
   return (
     <SafeAreaView style={styles.container}>

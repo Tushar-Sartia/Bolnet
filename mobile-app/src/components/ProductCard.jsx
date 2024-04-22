@@ -45,16 +45,16 @@ const ProductCard = ({ item, idx, navigation }) => {
             }}>
             <View style={styles.imageContainer}>
               <Image
-                source={{ uri: API_URL + '/' + item?.attachments }}
+                source={{ uri: MEDIA_URL + item?.attachments }}
                 style={styles.image}
               />
               <View style={styles.detailsContainer}>
-                <Text style={styles.name} numberOfLines={1}>{item.productName}</Text>
+                <Text style={styles.name} numberOfLines={1}>{item.product_name}</Text>
                 <View style={styles.nameContainer}>
-                  <Text style={[styles.name]} numberOfLines={1}>{moneyFormat(item.price).split('.00')}</Text>
-                  <Text style={[styles.oldPrice, { textDecorationLine: 'line-through' }]}>
-                    {moneyFormat(item?.oldPrice).split('.00')}</Text>
-                  {item?.discount?<Text style={[styles.oldPrice]} numberOfLines={2}>({item?.discount}% off)</Text>:<></>}
+                  <Text style={[styles.name]} numberOfLines={1}>{moneyFormat(item.selling_price).split('.00')}</Text>
+                  <Text style={[styles.price, { textDecorationLine: 'line-through' }]}>
+                    {moneyFormat(item?.price).split('.00')}</Text>
+                  {item?.discount?<Text style={[styles.price]} numberOfLines={2}>({item?.discount}% off)</Text>:<></>}
                 </View>
               </View>
               <View style={styles.buttonContainer}>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     paddingVertical: 3,
   },
-  oldPrice: {
+  price: {
     fontSize: 13,
     marginTop: 3,
     color: COLORS.COLOR_RED

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { COLORS } from '../utils/theme';
 import { Package } from 'lucide-react-native';
 import { getColor, moneyFormat } from '../utils/formatter';
-import { API_URL } from '../utils/constants';
+import { API_URL, MEDIA_URL } from '../utils/constants';
 import Button from '../components/Button';
 import BottomTab from '../navigation/BottomTab';
 import { ROUTES } from '../utils/routes';
@@ -60,10 +60,10 @@ const Order = ({ navigation }) => {
             {item?.items?.map((data) => (
 
                 <View style={styles.viewStyle}>
-                    <View style={[styles.viewStyle, { flex: 0.5 }]}>{console.log(data)}
+                    <View style={[styles.viewStyle, { flex: 0.5 }]}>
                         <Image
                             source={{
-                                uri: API_URL + '/' + data?.image,
+                                uri: MEDIA_URL + item?.attachments,
                             }}
                             style={{
                                 width: 80,
@@ -74,7 +74,7 @@ const Order = ({ navigation }) => {
                         />
                         <View>
                             <Text style={styles.textStyle} numberOfLines={2}>{' '}
-                                {data?.productName}</Text>
+                                {data?.product_name}</Text>
                             <Text >{' '}{moneyFormat(data?.price)}/p</Text>
                         </View>
                     </View>

@@ -2,7 +2,7 @@ import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View }
 import React, { useEffect, useState } from 'react'
 import { COLORS } from '../utils/theme'
 import { moneyFormat } from '../utils/formatter'
-import { API_URL } from '../utils/constants'
+import { API_URL, MEDIA_URL } from '../utils/constants'
 import Button from '../components/Button'
 import BottomTab from '../navigation/BottomTab'
 import { ROUTES } from '../utils/routes'
@@ -11,11 +11,13 @@ import { selectUser } from '../features/auth/authSlice'
 import Toast from 'react-native-toast-message'
 import { getCartItems, placeOrder, removeItemFromCart, updateCartQty } from '../services/userApi'
 import { Trash2 } from 'lucide-react-native'
+import { useIsFocused } from '@react-navigation/native'
 
 const Cart = ({ navigation }) => {
     const { user } = useSelector(selectUser)
     const [cartItem, setCartItem] = useState([])
     const [quantity, setQuantity] = useState(1)
+    const isFocused = useIsFocused()
     const [shippingAddress, setShippingAddress] = useState('Sartia Global ,noida sector-6,266234');
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const getCart = async () => {
@@ -79,7 +81,7 @@ const Cart = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', flex: 0.7, height: '100%', paddingHorizontal: 5 }}>
                     <Image
                         source={{
-                            uri: API_URL + '/' + item?.attachments,
+                            uri: MEDIA_URL + item?.attachments,
                         }}
                         style={{
                             width: 100,
@@ -91,9 +93,9 @@ const Cart = ({ navigation }) => {
                     <View style={[styles.details, { flex: 0.6, marginTop: 5 }]}>
                         <Text numberOfLines={2}
                             style={[styles.titleStyle]}>
-                            {item?.productName}
+                            {item?.product_name}
                         </Text>
-                        <Text style={[styles.detailTextStyle]}>{moneyFormat(item?.price)}</Text>
+                        <Text style={[styles.detailTextStyle]}>{moneyFormat(item?.selling_price)}</Text>
                         <Text style={[styles.detailTextStyle]}>Total Qty: {item?.totalQuantity}</Text>
                     </View>
                 </View>
@@ -123,10 +125,10 @@ const Cart = ({ navigation }) => {
     }
     const handleProceed = async () => {
         const productsToAdd = cartItem?.data?.map((item) => ({
-            price: item?.price,
+            price: item?.selling_price,
             quantity: item?.quantity,
             productId: item?.productId,
-            productName: item?.productName
+            productName: item?.product_name
         }));
 
         const payload = {
@@ -155,7 +157,7 @@ const Cart = ({ navigation }) => {
     }
     useEffect(() => {
         getCart()
-    }, [])
+    }, [isFocused])
     return (
         <View style={styles.screenContainer}>
             <ScrollView style={styles.mainContainer}>

@@ -14,7 +14,7 @@ customApi.interceptors.request.use(async config => {
 });
 export const loginInvestor = async body => {
   try {
-    const { data } = await customApi.post(`/user/userLogin`, body);
+    const { data } = await customApi.post(`/users/login`, body);
     return data;
   } catch (error) {
     return {
@@ -58,7 +58,7 @@ export const resetPasswordApi = async body => {
 };
 export const registerInvestor = async body => {
   try {
-    const { data } = await customApi.post(`/user/createUser`, body, {
+    const { data } = await customApi.post(`/users/create-users`, body, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -128,7 +128,7 @@ export const getProductReviews = async (id) => {
 };
 export const addToCart = async (body) => {
   try {
-    const { data } = await customApi.post('/cart/addToCart', body)
+    const { data } = await customApi.post('/cart/add-to-cart', body)
     return data;
   } catch (error) {
     return {
@@ -216,9 +216,20 @@ export const updateInvesterPassword = async values => {
     };
   }
 };
-export const getAllStates = async () => {
+export const getAllCountry = async () => {
   try {
-    const { data } = await customApi.get(`/get_state/101`);
+    const { data } = await customApi.get(`/country`);
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+export const getAllStates = async (id) => {
+  try {
+    const { data } = await customApi.get(`/state/${id}`);
     return data;
   } catch (error) {
     return {
@@ -229,7 +240,7 @@ export const getAllStates = async () => {
 };
 export const getAllCities = async id => {
   try {
-    const { data } = await customApi.get(`/get_city/${id}`);
+    const { data } = await customApi.get(`/city/${id}`);
     return data;
   } catch (error) {
     return {
@@ -348,7 +359,7 @@ export const getInvestmentHistory = async id => {
 
 export const getWalletDataApi = async id => {
   try {
-    const { data } = await customApi.get(`/investment_history/${id}`);
+    const { data } = await customApi.get(`/wallet/transaction/${id}`);
     return data;
   } catch (error) {
     return {

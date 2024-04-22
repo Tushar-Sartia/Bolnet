@@ -31,7 +31,7 @@ const Login = ({ navigation }) => {
   const handleLogin = async values => {
     setIsSubmitting(true);
     const body = {
-      mobile: values.phone,
+      email: values.email,
       password: values.password,
     };
     const res = await loginInvestor(body);
@@ -68,7 +68,7 @@ const Login = ({ navigation }) => {
         </View>
         <Formik
           initialValues={{
-            phone: '9999966858',
+            email: 'rohit.ksingh73@gmail.com',
             password: '12345678',
           }}
           validationSchema={loginSchema}
@@ -77,13 +77,12 @@ const Login = ({ navigation }) => {
             <View style={styles.formContainer}>
               <Text style={styles.heading}>Login</Text>
               <Input
-                label="Phone number"
-                name={'phone'}
+                label="Email"
+                name={'email'}
                 inputStyle={{ color: "black" }}
                 formikProps={props}
                 inputProps={{
-                  maxLength: 10,
-                  keyboardType: 'phone-pad',
+                  keyboardType: 'email',
                 }}
               />
               <Input

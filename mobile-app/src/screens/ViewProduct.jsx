@@ -61,7 +61,7 @@ const ViewProduct = ({ route, navigation }) => {
                     <View style={styles.viewStyle}>
                         <Image
                             source={{
-                                uri: `${API_URL}/${item?.attachments}`,
+                                uri: `${MEDIA_URL}${item?.profile}`,
                             }}
                             style={styles.imageIcon}
                         />
@@ -130,7 +130,7 @@ const ViewProduct = ({ route, navigation }) => {
         getReviews()
     }, [])
     const handleAddItems = (qty) => {
-        if (qty < (productDetail?.quantity || 1)) {
+        if (qty < (productDetail?.unit || 1)) {
             setQuantity(quantity + 1)
         }
     }
@@ -159,7 +159,6 @@ const ViewProduct = ({ route, navigation }) => {
                 position: "bottom",
             })
         }
-        //  navigation.navigate(ROUTES.cart)
     }
     return (
         <>
@@ -167,17 +166,17 @@ const ViewProduct = ({ route, navigation }) => {
                 <View style={styles.loader}>
                     <ActivityIndicator size={'large'} color={COLORS.COLOR_RED} />
                 </View> :
-                <View style={styles.container}>{console.log(productDetail)}
+                <View style={styles.container}>
                     <Image
                         source={{
-                            uri: `${API_URL}/${productDetail?.attachments}`,
+                            uri: `${MEDIA_URL}${productDetail?.attachments}`,
                         }}
                         style={styles.imageStyle}
                     />
                     <ScrollView style={styles.detailsContainer}>
                         <View style={styles.viewStyle}>
                             <View style={[styles.gap, { flex: 1 }]}>
-                                <Text style={[styles.titleStyle, { textTransform: 'capitalize' }]}>{productDetail?.productName}</Text>
+                                <Text style={[styles.titleStyle, { textTransform: 'capitalize' }]}>{productDetail?.product_name}</Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Button title={'−'} onPress={() => handleMinus()} />
@@ -189,20 +188,20 @@ const ViewProduct = ({ route, navigation }) => {
                         </View>
 
                         <View style={[styles.viewStyle, styles.gap]}>
-                            <Text style={[styles.titleStyle]}>{moneyFormat(productDetail?.price)}</Text>
+                            <Text style={[styles.titleStyle]}>{moneyFormat(productDetail?.selling_price)}</Text>
                             <Text style={{
                                 color: COLORS.COLOR_RED,
                                 textDecorationLine: 'line-through',
                                 margin: 5
-                            }}>{moneyFormat(productDetail?.oldPrice)}</Text>
+                            }}>{moneyFormat(productDetail?.price)}</Text>
                         </View>
-                        <Text>Items Left : {productDetail?.quantity}</Text>
+                        <Text>In Stock : {productDetail?.unit}</Text>
                         <Text style={{ textTransform: 'capitalize' }}>{productDetail?.details}</Text>
                         <View style={styles.line} />
                         <View style={[styles.viewStyle, { justifyContent: 'space-around' }]}>
                             <View style={styles.align}>
                                 <ShieldCheck color={COLORS.COLOR_RED} size={30} />
-                                <Text style={styles.subTitle}>{productDetail?.warrantyUpto} Year Warranty</Text>
+                                <Text style={styles.subTitle}>{productDetail?.warranty} Year Warranty</Text>
                             </View>
                             {productDetail?.freeDelivery == 1 && <View style={styles.align}>
                                 <Truck color={COLORS.COLOR_RED} size={30} />

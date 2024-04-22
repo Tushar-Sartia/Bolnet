@@ -14,13 +14,14 @@ import { Formik } from 'formik';
 import Button from '../../components/Button';
 import { registerSchema } from '../../utils/validationSchema';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { getAllCities, getAllStates, registerInvestor } from '../../services/userApi';
+import { getAllCities, getAllCountry, getAllStates, registerInvestor } from '../../services/userApi';
 import Toast from 'react-native-toast-message';
 
 const Register = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPasswordShowing, setIsPasswordShowing] = useState(false);
+  const [countryData, setCountryData] = useState([]);
   const [statesData, setStatesData] = useState([]);
   const [citiesData, setCitiesData] = useState([]);
 
@@ -31,9 +32,9 @@ const Register = ({ navigation }) => {
     fData.append('mobile', values.phone);
     fData.append('email', values.email);
     fData.append('password', values.password);
-    fData.append('country', values.country||null);
-    fData.append('state', values.state||null);
-    fData.append('city', values.city||null);
+    fData.append('country', values.country || null);
+    fData.append('state', values.state || null);
+    fData.append('city', values.city || null);
     const res = await registerInvestor(fData);
     if (res.status) {
       Toast.show({
@@ -53,8 +54,22 @@ const Register = ({ navigation }) => {
     setIsSubmitting(false);
   };
 
-  const getStates = async () => {
-    const res = await getAllStates();
+  const getCountry = async () => {
+    const res = await getAllCountry();
+    if (res.status) {
+      const rData = res?.data?.map(itm => {
+        return {
+          value: itm.id,
+          label: itm.name,
+        };
+      });
+      setCountryData(rData)
+    } else {
+      setCountryData([]);
+    }
+  };
+  const handleCountryChange = async (id) => {
+    const res = await getAllStates(id);
     if (res.status) {
       const rData = res?.data?.map(itm => {
         return {
@@ -67,14 +82,8 @@ const Register = ({ navigation }) => {
     } else {
       setStatesData([]);
     }
-  };
-
+  }
   const handleStateChange = async (value) => {
-    // if (value) {
-    //   setValue("value", value.value)
-    // }
-    // console.log(value);
-
     if (!value) return setCitiesData([]);
     const res = await getAllCities(value);
     if (res.status) {
@@ -91,7 +100,7 @@ const Register = ({ navigation }) => {
   };
 
   useEffect(() => {
-    getStates();
+    getCountry()
   }, []);
 
   return (
@@ -184,9 +193,12 @@ const Register = ({ navigation }) => {
                 select={{
                   isSelect: true,
                 }}
-                data={[
-                  { label: 'India', value: 101 },
-                ]}
+                onChange={(val) => {
+                  handleCountryChange(val.value);
+                  props.setFieldValue("country", val.value)
+                }
+                }
+                data={countryData}
               />
               <View style={{ flexDirection: 'row', gap: 20 }}>
                 <View style={{ flex: 1 }}>

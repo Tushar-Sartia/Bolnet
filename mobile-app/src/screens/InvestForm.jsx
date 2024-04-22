@@ -70,9 +70,7 @@ const InvestForm = () => {
     });
     bodyFormData.append('points', quantity);
     bodyFormData.append('amount', quantity * bankData?.investment_amount || 0);
-    console.log(bodyFormData)
     const res = await investFormApi(bodyFormData);
-    console.log(res)
     if (res.status) {
       Toast.show({
         type: 'success',

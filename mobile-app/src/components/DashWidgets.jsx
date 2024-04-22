@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
 import { moneyFormat, numberFormat } from '../utils/formatter';
 import { COLORS } from '../utils/theme';
-const DashWidgets = ({ color, title, value, isNumber = false }) => {
+const DashWidgets = ({ color, title, value, title2, value2, isNumber = false }) => {
   const { width } = useWindowDimensions();
   return (
     <View style={styles.earningContainer}>
@@ -11,6 +11,12 @@ const DashWidgets = ({ color, title, value, isNumber = false }) => {
         <Text style={[styles.earningText, { color }]}>
           {isNumber ? numberFormat(value) : moneyFormat(value)}
         </Text>
+        {title2 && <>
+          <Text style={styles.title}>{title2}</Text>
+          <Text style={[styles.earningText, { color }]}>
+            {isNumber ? numberFormat(value2) : moneyFormat(value2)}
+          </Text>
+        </>}
       </View>
     </View>
   );

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,29 +9,30 @@ import {
   Pressable,
   ActivityIndicator,
 } from 'react-native';
-import {COLORS} from '../../utils/theme';
+import { COLORS } from '../../utils/theme';
 import HeaderBg from '../../components/HeaderBg';
 import DashWidgets from '../../components/DashWidgets';
 import Button from '../../components/Button';
-import {moneyFormat} from '../../utils/formatter';
-import {format} from 'date-fns';
-import {Seperator} from '../../components/Seprator';
-import {Formik} from 'formik';
+import { moneyFormat } from '../../utils/formatter';
+import { format } from 'date-fns';
+import { Seperator } from '../../components/Seprator';
+import { Formik } from 'formik';
 import Input from '../../components/Input';
-import {amountSchema} from '../../utils/validationSchema';
-import {getWalletDataApi, withdrawAmountApi} from '../../services/userApi';
-import {useSelector} from 'react-redux';
-import {selectUser} from '../../features/auth/authSlice';
+import { amountSchema } from '../../utils/validationSchema';
+import { getWalletDataApi, withdrawAmountApi } from '../../services/userApi';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../features/auth/authSlice';
 import Toast from 'react-native-toast-message';
+import moment from 'moment';
 
 const Wallet = () => {
-  const {user} = useSelector(selectUser);
+  const { user } = useSelector(selectUser);
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [walletData, setWalletData] = useState([]);
   const [modalVisible, setModalVisible] = useState('');
   const [walletBalance, setWalletBalance] = useState(user?.balance || 0);
-
+  const [totalEarning, setTotalEarning] = useState([])
   const handleAmountSubmit = async value => {
     setLoading(true);
     const wData = {
@@ -61,16 +62,18 @@ const Wallet = () => {
 
   const fetchWalletData = async () => {
     const res = await getWalletDataApi(user?.id);
+    console.log(res)
     if (res.status) {
-      setWalletBalance(res?.balance || res.data.at(-1)?.balance || 0);
-      setWalletData(res.data);
+      setWalletBalance(res?.data?.balance || 0);
+      setTotalEarning(res?.data?.total_earning || 0);
+      setWalletData(res?.data?.results);
     }
   };
   useEffect(() => {
     fetchWalletData();
   }, [refresh]);
 
-  const RenderItem = ({item}) => {
+  const RenderItem = ({ item }) => {
     return (
       <View
         style={{
@@ -87,20 +90,20 @@ const Wallet = () => {
                 item.status === 'deposit_request'
                   ? COLORS.COLOR_BLACK
                   : item.status === 'withdraw_request'
-                  ? COLORS.COLOR_RED
-                  : COLORS.COLOR_GREEN,
+                    ? COLORS.COLOR_RED
+                    : COLORS.COLOR_GREEN,
             }}>
             {moneyFormat(item.amount)}
           </Text>
-          <Text style={{fontSize: 14}}>
+          <Text style={{ fontSize: 14 }}>
             {item.status === 'deposit_request'
               ? 'Deposit'
               : item.status === 'withdraw_request'
-              ? 'Withdraw'
-              : 'Investment Return'}
+                ? 'Withdraw'
+                : 'Investment Return'}
           </Text>
         </View>
-        <Text style={{fontSize: 14}}>{item.created_at}</Text>
+        <Text style={{ fontSize: 14 }}>{moment(item.created_at).format('DD/MM/YYYY')}</Text>
       </View>
     );
   };
@@ -111,20 +114,23 @@ const Wallet = () => {
       <DashWidgets
         title={'balance'}
         value={walletBalance}
+        title2={'Total Earning'}
+        value2={totalEarning}
         color={COLORS.COLOR_GREEN}
       />
+
       <Button
         title={'Withdraw'}
         onPress={() => setModalVisible(true)}
-        btnContainerStyle={{padding: 20}}
+        btnContainerStyle={{ padding: 20 }}
       />
 
-      <View style={{paddingHorizontal: 20}}>
-        <Text style={styles.titleText}>Investment History</Text>
+      <View style={{ paddingHorizontal: 20 }}>
+        <Text style={styles.titleText}>Investment History</Text>{console.log(walletData)}
         <FlatList
           data={walletData}
           keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => <RenderItem item={item} />}
+          renderItem={({ item }) => <RenderItem item={item} />}
           ItemSeparatorComponent={<Seperator />}
           showsVerticalScrollIndicator={false}
           style={{
@@ -158,9 +164,9 @@ const Wallet = () => {
                       keyboardType: 'numeric',
                     }}
                   />
-                  <View style={{marginTop: 10, flexDirection: 'row', gap: 10}}>
+                  <View style={{ marginTop: 10, flexDirection: 'row', gap: 10 }}>
                     <Pressable onPress={() => setModalVisible(!modalVisible)}>
-                      {({pressed}) => (
+                      {({ pressed }) => (
                         <View
                           style={{
                             transform: [
@@ -175,7 +181,7 @@ const Wallet = () => {
                     </Pressable>
 
                     <Pressable onPress={props.handleSubmit} disabled={loading}>
-                      {({pressed}) => (
+                      {({ pressed }) => (
                         <View
                           style={{
                             transform: [
@@ -187,7 +193,7 @@ const Wallet = () => {
                           <Text style={styles.buttonText}>
                             {loading ? (
                               <ActivityIndicator
-                                style={{paddingLeft: 15, paddingRight: 15}}
+                                style={{ paddingLeft: 15, paddingRight: 15 }}
                                 size="small"
                                 color="white"
                                 animating={loading}

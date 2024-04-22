@@ -35,8 +35,8 @@ const OrderDetails = ({ route, navigation }) => {
                 </View>
                 <View style={styles.line} />
                 {order?.items.map((item) => <View style={styles.viewStyle}>
-                    <View>
-                        <Text style={styles.textStyle}>{item?.productName} x {item?.orderedQuantity}</Text>
+                    <View>{console.log(item)}
+                        <Text style={styles.textStyle}>{item?.product_name} x {item?.orderedQuantity}</Text>
                         <Text style={styles.contentStyle}>({moneyFormat(item.price)})</Text>
                     </View>
                     <Text style={[styles.textStyle]}>{moneyFormat(item?.subtotal)}</Text>
