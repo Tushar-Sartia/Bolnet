@@ -291,7 +291,7 @@ export const addUserBankDetails = async values => {
 };
 export const contactFormApi = async values => {
   try {
-    const { data } = await customApi.post(`/send_query`, values);
+    const { data } = await customApi.post(`/help/help-requests`, values);
     return data;
   } catch (error) {
     return {

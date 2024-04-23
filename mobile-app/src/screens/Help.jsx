@@ -15,10 +15,10 @@ const Help = ({ navigation }) => {
 
   const handleSubmitQuery = async values => {
     const contactData = {
-      investor_id: user?.id,
-      name: values.name,
-      email_address: values.email,
-      contact_no: values.phone,
+      user_id: user?.id,
+      user_name: values.name,
+      email: values.email,
+      phone: values.phone,
       message: values.message
     }
     const res = await contactFormApi(contactData)
