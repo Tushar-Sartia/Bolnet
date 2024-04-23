@@ -7,7 +7,7 @@ import Button from '../../components/Button';
 import { bankSchema } from '../../utils/validationSchema';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, setUser } from '../../features/auth/authSlice';
-import { getUserBankDetails, updateUserDetails } from '../../services/userApi';
+import { addUserBankDetails, getUserBankDetails, updateUserDetails } from '../../services/userApi';
 import Toast from 'react-native-toast-message';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -21,15 +21,14 @@ const Bank = () => {
   const isFocused = useIsFocused()
   const handleUpdateBankAccount = async (values) => {
     setIsSubmitting(true);
-
     const body = {
       userId: user?.id,
       accountNumber: values.accountNumber,
       bankName: values.bankName,
-      userName: values.userName,
+      accountHolderName: values.accountHolderName,
       ifscCode: values.ifscCode,
     }
-    const res = await updateUserDetails(body);
+    const res = await addUserBankDetails(body);
     if (res.status) {
       Toast.show({
         type: 'success',
@@ -72,10 +71,10 @@ const Bank = () => {
         <SafeAreaView style={styles.container}>
           <Formik
             initialValues={{
-              bankName: userBankDetail?.bankName || '',
-              accountNumber: userBankDetail?.accountNumber?.toString() || '',
-              ifscCode: userBankDetail?.ifscCode || '',
-              userName: userBankDetail?.userName || '',
+              bankName: userBankDetail?.bank_name || '',
+              accountNumber: userBankDetail?.account_number?.toString() || '',
+              ifscCode: userBankDetail?.ifsc || '',
+              accountHolderName: userBankDetail?.account_holder_name || '',
             }}
             validationSchema={bankSchema}
             enableReinitialize
@@ -88,13 +87,14 @@ const Bank = () => {
                   name={'accountNumber'}
                   formikProps={props}
                   inputProps={{
+                    maxLength:12,
                     keyboardType: 'phone-pad',
                   }}
                 />
                 <Input label="IFSC code" name={'ifscCode'} formikProps={props} />
                 <Input
                   label="Account Holder Name"
-                  name={'userName'}
+                  name={'accountHolderName'}
                   formikProps={props}
                 />
                 <Button

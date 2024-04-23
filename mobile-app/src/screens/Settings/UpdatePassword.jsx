@@ -21,7 +21,8 @@ const UpdatePassword = ({ navigation }) => {
     const updatePassword = {
       id: user?.id,
       old_password: values.old_password,
-      password: values.password
+      password: values.password,
+      email:user?.email
     }
     // return console.log(updatePassword);
     const res = await updateInvesterPassword(updatePassword)

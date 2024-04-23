@@ -17,6 +17,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { profileInformationSchema } from '../../utils/validationSchema';
 import {
   getAllCities,
+  getAllCountry,
   getAllStates,
   updateProfile,
   updateUserDetails,
@@ -39,6 +40,8 @@ const UpdateProfile = () => {
   const [height, setHeight] = useState(70);
   const [statesData, setStatesData] = useState([]);
   const [citiesData, setCitiesData] = useState([]);
+  const [countryData, setCountryData] = useState([]);
+
   const dispatch = useDispatch();
 
   const askMediPermission = async () => {
@@ -141,8 +144,22 @@ const UpdateProfile = () => {
     }
   };
 
-  const getStates = async () => {
-    const res = await getAllStates();
+  const getCountry = async () => {
+    const res = await getAllCountry();
+    if (res.status) {
+      const rData = res?.data?.map(itm => {
+        return {
+          value: itm.id,
+          label: itm.name,
+        };
+      });
+      setCountryData(rData)
+    } else {
+      setCountryData([]);
+    }
+  };
+  const handleCountryChange = async (id) => {
+    const res = await getAllStates(id);
     if (res.status) {
       const rData = res?.data?.map(itm => {
         return {
@@ -154,7 +171,7 @@ const UpdateProfile = () => {
     } else {
       setStatesData([]);
     }
-  };
+  }
 
   const handleStateChange = async value => {
     if (!value) return setCitiesData([]);
@@ -175,23 +192,23 @@ const UpdateProfile = () => {
     if (user?.id) {
       handleStateChange(user?.state);
     }
-    getStates();
+    getCountry()
   }, []);
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ flexGrow: 1 }}
       style={styles.container}>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container}>{console.log(user)}
         <Formik
           enableReinitialize={true}
           initialValues={{
             image:user?.image||'',
             name: user?.name || '',
             email: user?.email || '',
-            phone: user?.mobile || '',
-            address: user?.address || '',
-            country: 101 || '',
+            phone: user?.phone || '',
+            address: user?.current_add || '',
+            country: user?.country || '',
             state: user?.state || '',
             city: user?.city || '',
             pincode: user?.pincode || '',
@@ -255,7 +272,7 @@ const UpdateProfile = () => {
                 name={'phone'}
                 formikProps={props}
                 inputProps={{
-                  maxLength: 10,
+                  maxLength: 13,
                   keyboardType: 'phone-pad',
                 }}
               />
@@ -264,11 +281,15 @@ const UpdateProfile = () => {
                 label="Country"
                 name={'country'}
                 formikProps={props}
-                onChange={val => props.setFieldValue('country', val.value)}
+                onChange={(val) => {
+                  handleCountryChange(val.value);
+                  props.setFieldValue("country", val.value)
+                }
+                }
+                data={countryData}
                 select={{
                   isSelect: true,
                 }}
-                data={[{ label: 'India', value: 101 }]}
               />
               <View style={{ flexDirection: 'row', gap: 20 }}>
                 <View style={{ flex: 1 }}>

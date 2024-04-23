@@ -1,7 +1,7 @@
 import express from 'express';
 import verifyToken from '../middleware/verifyJwt.js';
 import { upload } from '../middleware/uploads.js';
-import { addProduct, getProduct, getProductDetails, getProductReview, getProductSpecification, productDetails, productReviews, productSpecification } from '../controller/product.controller.js';
+import { addProduct, getPopularProduct, getProduct, getProductDetails, getProductReview, getProductSpecification, productDetails, productReviews, productSpecification } from '../controller/product.controller.js';
 
 export const productRouter = express.Router();
 const app = express();
@@ -20,5 +20,6 @@ productRouter.post('/productSpecification', verifyToken, productSpecification);
 //product reviews
 productRouter.get('/getProductReviews/:productId', verifyToken, getProductReview);
 productRouter.post('/productReviews', verifyToken, productReviews);
-productRouter.post('/productReviews', verifyToken, productReviews);
 
+//popular products
+productRouter.get('/popularProducts', verifyToken, getPopularProduct);

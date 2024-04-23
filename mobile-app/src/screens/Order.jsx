@@ -58,12 +58,11 @@ const Order = ({ navigation }) => {
             </View>
             <View style={styles.line} />
             {item?.items?.map((data) => (
-
                 <View style={styles.viewStyle}>
                     <View style={[styles.viewStyle, { flex: 0.5 }]}>
                         <Image
                             source={{
-                                uri: MEDIA_URL + item?.attachments,
+                                uri: MEDIA_URL + data?.attachments,
                             }}
                             style={{
                                 width: 80,

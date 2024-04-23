@@ -31,7 +31,7 @@ const SettingsLinks = ({ links }) => {
           <Text style={styles.name}>{user?.name}</Text>
           <View style={{ flexDirection: 'row' }}>
             <Phone color={COLORS.COLOR_BLUE} size={15} />
-            <Text style={styles.detail}>{user?.mobile}</Text>
+            <Text style={styles.detail}>{user?.phone}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <AtSign color={COLORS.COLOR_BLUE} size={15} />
@@ -42,8 +42,7 @@ const SettingsLinks = ({ links }) => {
           source={
             user?.image
               ? {
-                uri: API_URL
-                  + '/' + user?.image,
+                uri: MEDIA_URL+'/'+user?.profile,
               }
               : DUMMY_PROFILE_IMAGE
           }

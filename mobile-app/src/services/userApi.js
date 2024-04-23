@@ -207,7 +207,7 @@ export const getInvestorBankDetails = async values => {
 };
 export const updateInvesterPassword = async values => {
   try {
-    const { data } = await customApi.post(`/user/changePassword`, values);
+    const { data } = await customApi.post(`/users/password-change`, values);
     return data;
   } catch (error) {
     return {
@@ -249,9 +249,14 @@ export const getAllCities = async id => {
     };
   }
 };
-export const getUserBankDetails = async values => {
+export const updateUserDetails = async values => {
   try {
-    const { data } = await customApi.post(`/user/getBankDetails`, values
+    const { data } = await customApi.post(`/users/update-users`, values,
+       {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
     return data;
   } catch (error) {
@@ -261,15 +266,21 @@ export const getUserBankDetails = async values => {
     };
   }
 };
-export const updateUserDetails = async values => {
+export const getUserBankDetails = async values => {
   try {
-    const { data } = await customApi.post(`/user/addBankDetails`, values,
-      //  {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //   },
-      // }
+    const { data } = await customApi.post(`/users/get-bank-details`, values
     );
+    return data;
+  } catch (error) {
+    return {
+      status: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+export const addUserBankDetails = async values => {
+  try {
+    const { data } = await customApi.post(`/users/add-bank-details`, values);
     return data;
   } catch (error) {
     return {
@@ -321,16 +332,18 @@ export const investFormApi = async values => {
 };
 export const updateNomineDetails = async values => {
   try {
-    const { data } = await customApi.post('/user/nomineeUpdate', values, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const { data } = await customApi.post(`/users/update-nominee`, values,
+       {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     return data;
   } catch (error) {
     return {
       status: false,
-      message: error?.response?.data?.message || error?.message,
+      message: error.response?.data?.message || error.message,
     };
   }
 };

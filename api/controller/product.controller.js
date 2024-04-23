@@ -27,7 +27,6 @@ export const getProduct = async (req, res) => {
         return res.status(500).json({ message: err.message, status: false })
     }
 }
-
 //used for getting the product details 
 export const getProductDetails = async (req, res) => {
     try {
@@ -80,7 +79,6 @@ export const productDetails = async (req, res) => {
         return res.status(500).json({ message: err.message, status: false })
     }
 }
-
 //used for gettting product Specification by productId 
 export const getProductSpecification = async (req, res) => {
     try {
@@ -158,13 +156,9 @@ export const getProductReview = async (req, res) => {
         return res.status(500).json({ message: err.message, status: false })
     }
 }
-export const addPopularProduct = async (req, res) => {
+export const getPopularProduct = async (req, res) => {
     try {
-        const { productId } = req.params
-        const getProductQuery = `SELECT product_reviews.*,users.image,users.name 
-        FROM product_reviews
-        LEFT JOIN users ON product_reviews.userId=users.id
-        WHERE productId=${productId}`
+        const getProductQuery = `SELECT * FROM product ORDER BY quantitySold DESC`
         const results = await db.query(getProductQuery)
         if (results.length > 0) {
             return res.status(200).json({ data: results, status: true })

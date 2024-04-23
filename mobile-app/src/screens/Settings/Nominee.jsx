@@ -57,7 +57,7 @@ const Nominee = () => {
     bodyFormData.append('created_by', user?.id);
     bodyFormData.append('nominee', values.nominee);
     if (selectedImage) {
-      bodyFormData.append('nominee_image', {
+      bodyFormData.append('attachments', {
         name: new Date().getTime() + '.jpg',
         uri: selectedImage,
         type: 'image/jpeg',

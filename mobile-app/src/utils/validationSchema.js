@@ -62,10 +62,10 @@ export const profileInformationSchema = Yup.object().shape({
   pincode: Yup.string().required('Pin Code is Required'),
 });
 export const bankSchema = Yup.object().shape({
-  bank_name: Yup.string().required('Bank Name is Required'),
-  account_number: Yup.string().required('Account Number is Required'),
-  ifsc: Yup.string().required('IFSC Code is Required'),
-  account_holder_name: Yup.string().required('Account Name is Required'),
+  bankName: Yup.string().required('Bank Name is Required'),
+  accountNumber: Yup.string().required('Account Number is Required'),
+  ifscCode: Yup.string().required('IFSC Code is Required'),
+  accountHolderName: Yup.string().required('Account Name is Required'),
 });
 export const contactFormSchema = Yup.object().shape({
   name: Yup.string().required('Name is Required'),
