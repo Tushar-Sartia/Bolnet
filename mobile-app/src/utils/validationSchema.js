@@ -35,9 +35,9 @@ export const registerSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, 'Atleast 3 charactor!!')
     .required('Name is required!!'),
-  // state: Yup.mixed().required('State is required!!'),
-  // country: Yup.mixed().required('Country is required!!'),
-  // city: Yup.mixed().required('City is required!!'),
+  state: Yup.mixed().required('State is required!!'),
+  country: Yup.mixed().required('Country is required!!'),
+  city: Yup.mixed().required('City is required!!'),
 });
 export const updatePasswordSchema = Yup.object().shape({
   old_password: Yup.string()
@@ -57,8 +57,8 @@ export const profileInformationSchema = Yup.object().shape({
     .matches(phoneRegExp, 'Phone number is not valid')
     .required('Phone is Required'),
   address: Yup.string().required('Address is Required'),
-  // state: Yup.mixed().required('State is Required'),
-  // city: Yup.string().required('City is Required'),
+  state: Yup.mixed().required('State is Required'),
+  city: Yup.string().required('City is Required'),
   pincode: Yup.string().required('Pin Code is Required'),
 });
 export const bankSchema = Yup.object().shape({

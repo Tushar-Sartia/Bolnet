@@ -12,7 +12,7 @@ import { COLORS } from '../../utils/theme';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectUser, setUser, signIn } from '../../features/auth/authSlice';
+import { logout, selectUser, setUser, signIn } from '../../features/auth/authSlice';
 import ImagePicker from 'react-native-image-crop-picker';
 import { profileInformationSchema } from '../../utils/validationSchema';
 import {
@@ -56,7 +56,7 @@ const UpdateProfile = () => {
     }
   };
   const handleUpdateProfileData = async values => {
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
     const fData = new FormData();
     if (!selectedImage && !user?.image) {
       return Toast.show({
@@ -67,29 +67,28 @@ const UpdateProfile = () => {
       });
     }
 
-    fData.append('image', {
+    fData.append('profile', {
       name: new Date().getTime() + '.jpg',
       uri: selectedImage || user?.image,
       type: 'image/jpeg',
     });
     fData.append('id', user?.id);
     fData.append('name', values.name);
-    fData.append('mobile', values.phone);
+    fData.append('phone', values.phone);
     fData.append('email', values.email);
     fData.append('address', values.address);
-    fData.append('country_id', values.country);
+    fData.append('country', values.country);
     fData.append('state', values.state);
     fData.append('city', values.city);
     fData.append('pincode', values.pincode);
     const res = await updateUserDetails(fData);
     if (res.status) {
-      dispatch(signIn(res.data));
       Toast.show({
         type: 'success',
         text2: res.message,
         position: 'bottom',
       });
-      dispatch(setUser(res.data));
+      dispatch(logout())
     } else {
       Toast.show({
         type: 'error',
@@ -199,11 +198,11 @@ const UpdateProfile = () => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ flexGrow: 1 }}
       style={styles.container}>
-      <SafeAreaView style={styles.container}>{console.log(user)}
+      <SafeAreaView style={styles.container}>
         <Formik
           enableReinitialize={true}
           initialValues={{
-            image:user?.image||'',
+            image: user?.image || '',
             name: user?.name || '',
             email: user?.email || '',
             phone: user?.phone || '',
@@ -211,7 +210,7 @@ const UpdateProfile = () => {
             country: user?.country || '',
             state: user?.state || '',
             city: user?.city || '',
-            pincode: user?.pincode || '',
+            pincode: user?.pincode.toString() || '',
           }}
           validationSchema={profileInformationSchema}
           onSubmit={handleUpdateProfileData}>
@@ -223,16 +222,9 @@ const UpdateProfile = () => {
                     source={
                       selectedImage
                         ? { uri: selectedImage }
-                        : user?.image
-                          ? { uri: `${API_URL}/${user?.image}` }
+                        : user?.profile
+                          ? { uri: `${MEDIA_URL}/${user?.profile}` }
                           : DUMMY_PROFILE_IMAGE
-                      //   {
-                      //   uri: selectedImage
-                      //     ? selectedImage
-                      //     : user?.image
-                      //     ? `${API_URL}/${user?.image}`
-                      //     : 'https://thewingshield.com/office/files/profile_images//_file601903341d32e-avatar.png',
-                      // }
                     }
                     style={{
                       width: 100,
@@ -272,7 +264,7 @@ const UpdateProfile = () => {
                 name={'phone'}
                 formikProps={props}
                 inputProps={{
-                  maxLength: 13,
+                  maxLength: 10,
                   keyboardType: 'phone-pad',
                 }}
               />

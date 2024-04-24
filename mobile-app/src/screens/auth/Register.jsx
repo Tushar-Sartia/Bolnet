@@ -29,7 +29,7 @@ const Register = ({ navigation }) => {
     setIsSubmitting(true);
     const fData = new FormData();
     fData.append('name', values.name);
-    fData.append('mobile', values.phone);
+    fData.append('phone', values.phone);
     fData.append('email', values.email);
     fData.append('password', values.password);
     fData.append('country', values.country || null);

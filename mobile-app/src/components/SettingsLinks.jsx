@@ -40,9 +40,9 @@ const SettingsLinks = ({ links }) => {
         </View>
         <Image
           source={
-            user?.image
+            user?.profile
               ? {
-                uri: MEDIA_URL+'/'+user?.profile,
+                uri: `${MEDIA_URL}/${user?.profile}`,
               }
               : DUMMY_PROFILE_IMAGE
           }

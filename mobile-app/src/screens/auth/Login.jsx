@@ -111,7 +111,7 @@ const Login = ({ navigation }) => {
                 }
               />
               <Pressable>
-                <Text style={styles.forgetPass} onPress={() => navigation.navigate(ROUTES.verifyPhone)}>forgot Password? </Text>
+                <Text style={styles.forgetPass} onPress={() => navigation.navigate(ROUTES.verifyPhone)}>Forgot Password</Text>
               </Pressable>
               <Button
                 title={'login'}
@@ -123,7 +123,10 @@ const Login = ({ navigation }) => {
                   navigation.navigate(ROUTES.register);
                 }}>
                 <Text style={styles.signupLink}>
-                  Don't have an account? Signup here
+                  Don't have an account?
+                  <Text style={styles.signupText}>
+                    {' '}Signup Here
+                  </Text>
                 </Text>
               </Pressable>
             </View>
@@ -161,11 +164,14 @@ const styles = StyleSheet.create({
     color: COLORS.COLOR_BLUE,
   },
   signupLink: {
-    fontWeight: 'bold',
-    fontSize: 21,
-    color: COLORS.COLOR_BLUE,
+    color: COLORS.COLOR_BLACK,
     marginTop: 24,
     textAlign: 'center',
+  },
+  signupText: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: COLORS.COLOR_BLUE,
   },
 });
 export default Login;
