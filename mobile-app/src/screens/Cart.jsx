@@ -1,4 +1,4 @@
-import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { COLORS } from '../utils/theme'
 import { moneyFormat } from '../utils/formatter'
@@ -18,9 +18,11 @@ const Cart = ({ navigation }) => {
     const [cartItem, setCartItem] = useState([])
     const [quantity, setQuantity] = useState(1)
     const isFocused = useIsFocused()
+    const [refreshing, setRefreshing] = useState(false);
     const [shippingAddress, setShippingAddress] = useState('Sartia Global ,noida sector-6,266234');
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const getCart = async () => {
+        setRefreshing(true);
         const res = await getCartItems(user?.id)
         if (res?.status) {
             setCartItem(res)
@@ -28,6 +30,7 @@ const Cart = ({ navigation }) => {
         else {
             setCartItem([])
         }
+        setRefreshing(false);
     }
     const handleRemoveItem = async (item) => {
         const body = {
@@ -160,7 +163,13 @@ const Cart = ({ navigation }) => {
     }, [isFocused])
     return (
         <View style={styles.screenContainer}>
-            <ScrollView style={styles.mainContainer}>
+            <ScrollView style={styles.mainContainer}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={getCart}
+                    />
+                }>
                 <View>
                     {cartItem?.data?.length > 0 ?
                         cartItem?.data?.map((item, index) => (

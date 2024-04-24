@@ -62,7 +62,6 @@ const Wallet = () => {
 
   const fetchWalletData = async () => {
     const res = await getWalletDataApi(user?.id);
-    console.log(res)
     if (res.status) {
       setWalletBalance(res?.data?.balance || 0);
       setTotalEarning(res?.data?.total_earning || 0);
@@ -109,110 +108,116 @@ const Wallet = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderBg />
-      <DashWidgets
-        title={'balance'}
-        value={walletBalance}
-        title2={'Total Earning'}
-        value2={totalEarning}
-        color={COLORS.COLOR_GREEN}
-      />
-
-      <Button
-        title={'Withdraw'}
-        onPress={() => setModalVisible(true)}
-        btnContainerStyle={{ padding: 20 }}
-      />
-
-      <View style={{ paddingHorizontal: 20 }}>
-        <Text style={styles.titleText}>Investment History</Text>{console.log(walletData)}
-        <FlatList
-          data={walletData}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => <RenderItem item={item} />}
-          ItemSeparatorComponent={<Seperator />}
-          showsVerticalScrollIndicator={false}
-          style={{
-            marginBottom: 230,
-          }}
-        />
-      </View>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Formik
-              initialValues={{
-                amount: '',
-              }}
-              validationSchema={amountSchema}
-              onSubmit={handleAmountSubmit}>
-              {props => (
-                <View>
-                  <Input
-                    label="Withdraw Amount"
-                    name={'amount'}
-                    formikProps={props}
-                    inputProps={{
-                      keyboardType: 'numeric',
-                    }}
-                  />
-                  <View style={{ marginTop: 10, flexDirection: 'row', gap: 10 }}>
-                    <Pressable onPress={() => setModalVisible(!modalVisible)}>
-                      {({ pressed }) => (
-                        <View
-                          style={{
-                            transform: [
-                              {
-                                scale: pressed ? 0.98 : 1,
-                              },
-                            ],
-                          }}>
-                          <Text style={styles.buttonText}>Cancel</Text>
-                        </View>
-                      )}
-                    </Pressable>
-
-                    <Pressable onPress={props.handleSubmit} disabled={loading}>
-                      {({ pressed }) => (
-                        <View
-                          style={{
-                            transform: [
-                              {
-                                scale: pressed ? 0.98 : 1,
-                              },
-                            ],
-                          }}>
-                          <Text style={styles.buttonText}>
-                            {loading ? (
-                              <ActivityIndicator
-                                style={{ paddingLeft: 15, paddingRight: 15 }}
-                                size="small"
-                                color="white"
-                                animating={loading}
-                              />
-                            ) : (
-                              'Submit'
-                            )}
-                          </Text>
-                        </View>
-                      )}
-                    </Pressable>
-                  </View>
-                </View>
-              )}
-            </Formik>
-          </View>
+    <>
+      {loading &&
+        <View style={styles.loader}>
+          <ActivityIndicator color={COLORS.COLOR_RED} size={35} />
         </View>
-      </Modal>
-    </SafeAreaView>
+      }
+      <SafeAreaView style={styles.container}>
+        <View style={{ flex: 0.8 }}>
+          <HeaderBg />
+          <DashWidgets
+            title={'balance'}
+            value={walletBalance}
+            title2={'Total Earning'}
+            value2={totalEarning}
+            color={COLORS.COLOR_GREEN}
+          />
+
+          <Button
+            title={'Withdraw'}
+            onPress={() => setModalVisible(true)}
+            btnContainerStyle={{ padding: 20 }}
+          />
+        </View>
+        <View style={{ paddingHorizontal: 20, flex: 1 }}>
+          <Text style={styles.titleText}>Investment History</Text>
+          <FlatList
+            data={walletData}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => <RenderItem item={item} />}
+            ItemSeparatorComponent={<Seperator />}
+            showsVerticalScrollIndicator={false}
+
+          />
+        </View>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Formik
+                initialValues={{
+                  amount: '',
+                }}
+                validationSchema={amountSchema}
+                onSubmit={handleAmountSubmit}>
+                {props => (
+                  <View>
+                    <Input
+                      label="Withdraw Amount"
+                      name={'amount'}
+                      formikProps={props}
+                      inputProps={{
+                        keyboardType: 'numeric',
+                      }}
+                    />
+                    <View style={{ marginTop: 10, flexDirection: 'row', gap: 10 }}>
+                      <Pressable onPress={() => setModalVisible(!modalVisible)}>
+                        {({ pressed }) => (
+                          <View
+                            style={{
+                              transform: [
+                                {
+                                  scale: pressed ? 0.98 : 1,
+                                },
+                              ],
+                            }}>
+                            <Text style={styles.buttonText}>Cancel</Text>
+                          </View>
+                        )}
+                      </Pressable>
+
+                      <Pressable onPress={props.handleSubmit} disabled={loading}>
+                        {({ pressed }) => (
+                          <View
+                            style={{
+                              transform: [
+                                {
+                                  scale: pressed ? 0.98 : 1,
+                                },
+                              ],
+                            }}>
+                            <Text style={styles.buttonText}>
+                              {loading ? (
+                                <ActivityIndicator
+                                  style={{ paddingLeft: 15, paddingRight: 15 }}
+                                  size="small"
+                                  color="white"
+                                  animating={loading}
+                                />
+                              ) : (
+                                'Submit'
+                              )}
+                            </Text>
+                          </View>
+                        )}
+                      </Pressable>
+                    </View>
+                  </View>
+                )}
+              </Formik>
+            </View>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </>
   );
 };
 const styles = StyleSheet.create({
@@ -275,5 +280,11 @@ const styles = StyleSheet.create({
     color: 'white',
     backgroundColor: 'red',
   },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.COLOR_RED,
+  }
 });
 export default Wallet;

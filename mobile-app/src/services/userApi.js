@@ -73,7 +73,7 @@ export const registerInvestor = async body => {
 };
 export const getPopularProducts = async () => {
   try {
-    const { data } = await customApi.get(`/product/popularProduct`);
+    const { data } = await customApi.get(`/product/popular-product`);
     return data;
   } catch (error) {
     return {
@@ -372,7 +372,7 @@ export const getInvestmentHistory = async id => {
 
 export const getWalletDataApi = async id => {
   try {
-    const { data } = await customApi.get(`/wallet/transaction/${id}`);
+    const { data } = await customApi.get(`/wallet/wallet-details/${id}`);
     return data;
   } catch (error) {
     return {
@@ -405,7 +405,7 @@ export const deleteAccountApi = async id => {
 };
 export const dashboardApi = async id => {
   try {
-    const { data } = await customApi.get(`/investment_dashboard/${id}`);
+    const { data } = await customApi.get(`/investment/investment_dashboard/${id}`);
     return data;
   } catch (error) {
     return {

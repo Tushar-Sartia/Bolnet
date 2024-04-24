@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   earningText: {
     fontWeight: 'bold',
     color: COLORS.COLOR_GREEN,
-    fontSize: 35,
+    fontSize: 30,
     alignItems: 'center',
     textAlign: 'center',
   },

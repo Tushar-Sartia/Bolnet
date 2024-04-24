@@ -29,28 +29,28 @@ const Home = ({ navigation }) => {
   const dashData = [
     {
       id: 'total earnings',
-      value: data?.total_earnings || 0,
+      value: data?.total_earning || 0,
       color: COLORS.COLOR_GREEN,
     },
     {
       id: 'total invested',
-      value: data?.totalInvest || 0,
+      value: data?.total_investment || 0,
       color: COLORS.COLOR_BLACK,
     },
     {
       id: 'total products',
-      value: data?.totalProduct || 0,
+      value: data?.total_product || 0,
       color: COLORS.COLOR_BLUE,
       isNumber: true,
     },
     {
       id: "today's sale",
-      value: data?.getSellValue || 0,
+      value: data?.total_sale || 0,
       color: COLORS.COLOR_BLUE,
     },
     {
       id: "my today's profit",
-      value: data?.todayErning || 0,
+      value: data?.today_profit || 0,
       color: COLORS.COLOR_GREEN,
     },
   ];

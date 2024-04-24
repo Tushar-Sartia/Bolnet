@@ -14,7 +14,7 @@ import { moneyFormat } from '../utils/formatter';
 const PopularProduct = ({ item, idx, navigation }) => {
    
     return (
-        <View style={styles.container}>
+        <View style={styles.container}>{console.log(item)}
             <TouchableOpacity
                 style={{
                     backgroundColor: COLORS.BACKGROUND_COLOR_LIGHT,
@@ -27,7 +27,7 @@ const PopularProduct = ({ item, idx, navigation }) => {
                 <View style={{ flex: 0.7, alignItems: 'center' }}>
                     <Image
                         source={{
-                            uri: API_URL + '/' + item?.attachments,
+                            uri: MEDIA_URL + item?.attachments,
                         }}
                         style={{
                             width: 80,
@@ -39,10 +39,10 @@ const PopularProduct = ({ item, idx, navigation }) => {
                 <View style={{ flex: 1, alignSelf: 'flex-start', marginTop: 5 }}>
                     <Text
                         style={styles.titleStyle}>
-                        {item.productName}
+                        {item.product_name}
                     </Text>
-                    <Text>{moneyFormat(item?.price)}</Text>
-                    <Text>Sold: {item?.quantitySold}</Text>
+                    <Text>{moneyFormat(item?.selling_price)}</Text>
+                    <Text>Sold: {item?.unit_sold}</Text>
                 </View>
                 <View style={styles.cartBtn}>
                     <Text style={[styles.titleStyle, { color: COLORS.COLOR_WHITE }]}>Add to Cart</Text>

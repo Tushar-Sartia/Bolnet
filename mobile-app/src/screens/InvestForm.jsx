@@ -83,7 +83,7 @@ const InvestForm = () => {
       Toast.show({
         type: 'error',
         text2: res.message,
-        position: 'bottom',
+        position: 'top',
         visibilityTime: 3000,
       });
     }
@@ -251,7 +251,7 @@ const InvestForm = () => {
         <View style={styles.detailContainer}>
           <Text style={styles.titleText}>Lock in period</Text>
           <Text style={[styles.titleText, styles.valueText]}>
-            {bankData?.lock_in_period} months
+            {bankData?.period} months
           </Text>
         </View>
         <View style={{ marginVertical: 20, paddingHorizontal: 10 }}>

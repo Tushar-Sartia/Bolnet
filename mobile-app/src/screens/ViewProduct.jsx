@@ -87,13 +87,6 @@ const ViewProduct = ({ route, navigation }) => {
         if (res?.status) {
             setProductDetail(res?.data[0])
         }
-        else {
-            Toast.show({
-                type: "error",
-                text2: res?.message,
-                position: "bottom",
-            })
-        }
         setLoading(false)
     }
     const getSpecification = async () => {
@@ -102,26 +95,13 @@ const ViewProduct = ({ route, navigation }) => {
         if (res?.status) {
             setSpecifications(res?.data[0])
         }
-        else {
-            Toast.show({
-                type: "error",
-                text2: res.message,
-                position: "bottom",
-            })
-        }
+       
     }
     const getReviews = async () => {
         const productId = item.id
         const res = await getProductReviews(productId)
         if (res?.status) {
             setReviews(res?.data)
-        }
-        else {
-            Toast.show({
-                type: "error",
-                text2: res?.message,
-                position: "bottom",
-            })
         }
     }
     useEffect(() => {

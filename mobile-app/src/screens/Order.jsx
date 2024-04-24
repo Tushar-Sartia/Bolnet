@@ -1,4 +1,4 @@
-import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { COLORS } from '../utils/theme';
 import { Package } from 'lucide-react-native';
@@ -17,9 +17,11 @@ import moment from 'moment';
 const Order = ({ navigation }) => {
     const { user } = useSelector(selectUser)
     const [order, setOrders] = useState([])
+    const [loader, setLoader] = useState(false)
     const isFocused = useIsFocused()
 
     const getmyOrders = async () => {
+        setLoader(true)
         const res = await getAllOrders(user?.id)
         if (res?.status) {
             setOrders(res?.data)
@@ -32,6 +34,7 @@ const Order = ({ navigation }) => {
                 position: "bottom",
             })
         }
+        setLoader(false)
     }
     useEffect(() => {
         getmyOrders()
@@ -102,12 +105,17 @@ const Order = ({ navigation }) => {
     )
     return (
         <>
+            {loader &&
+                <View style={styles.loader}>
+                    <ActivityIndicator color={COLORS.COLOR_RED} size={35} />
+                </View>
+            }
             <FlatList
                 data={order}
                 keyExtractor={itm => itm.id}
                 renderItem={({ item, index }) => <MyOrders item={item} index={index} />}
-                refreshControl={<></>
-                    // <RefreshControl refreshing={isLoading} onRefresh={fetchAllProducts} />
+                refreshControl={
+                    <RefreshControl onRefresh={getmyOrders} />
                 }
             />
             <BottomTab active={ROUTES.profile} />
@@ -166,4 +174,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+      }
 })
