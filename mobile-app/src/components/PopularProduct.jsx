@@ -8,13 +8,38 @@ import {
     Pressable,
 } from 'react-native';
 import { COLORS } from '../utils/theme';
-import { API_URL, MEDIA_URL } from '../utils/constants';
-import { ROUTES } from '../utils/routes';
+import {  MEDIA_URL } from '../utils/constants';
 import { moneyFormat } from '../utils/formatter';
+import { selectUser } from '../features/auth/authSlice';
+import { useSelector } from 'react-redux';
+import { addToCart } from '../services/userApi';
+import Toast from 'react-native-toast-message';
 const PopularProduct = ({ item, idx, navigation }) => {
-   
+    const { user } = useSelector(selectUser)
+    const handleCartButton = async () => {
+        const cartItem = {
+            productId: item.id,
+            quantity: 1,
+            userId: user?.id
+        }
+        const res = await addToCart(cartItem)
+        if (res.status) {
+            Toast.show({
+                type: "success",
+                text1: res.message,
+                position: "bottom",
+            })
+        }
+        else {
+            Toast.show({
+                type: "error",
+                text2: res.message,
+                position: "bottom",
+            })
+        }
+    }
     return (
-        <View style={styles.container}>{console.log(item)}
+        <View style={styles.container}>
             <TouchableOpacity
                 style={{
                     backgroundColor: COLORS.BACKGROUND_COLOR_LIGHT,
@@ -44,9 +69,9 @@ const PopularProduct = ({ item, idx, navigation }) => {
                     <Text>{moneyFormat(item?.selling_price)}</Text>
                     <Text>Sold: {item?.unit_sold}</Text>
                 </View>
-                <View style={styles.cartBtn}>
+                <TouchableOpacity style={styles.cartBtn} onPress={handleCartButton}>
                     <Text style={[styles.titleStyle, { color: COLORS.COLOR_WHITE }]}>Add to Cart</Text>
-                </View>
+                </TouchableOpacity>
             </TouchableOpacity>
         </View>
     );
@@ -58,8 +83,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     cartBtn: {
-        flex:0.7,
-        marginRight:10,
+        flex: 0.7,
+        marginRight: 10,
         height: 40,
         borderRadius: 10,
         backgroundColor: COLORS.PRIMARY_COLOR,
@@ -67,7 +92,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     titleStyle: {
-        color:COLORS.COLOR_BLACK,
+        color: COLORS.COLOR_BLACK,
         fontWeight: 'bold',
         fontSize: 15,
         textTransform: 'capitalize'
