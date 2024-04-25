@@ -58,7 +58,7 @@ export const resetPasswordApi = async body => {
 };
 export const registerInvestor = async body => {
   try {
-    const { data } = await customApi.post(`/users/create-users`, body, {
+    const { data } = await customApi.post(`/users/app-create-users`, body, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -251,8 +251,8 @@ export const getAllCities = async id => {
 };
 export const updateUserDetails = async values => {
   try {
-    const { data } = await customApi.post(`/users/update-users`, values,
-       {
+    const { data } = await customApi.post(`/users/app-update-users`, values,
+      {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -333,7 +333,7 @@ export const investFormApi = async values => {
 export const updateNomineDetails = async values => {
   try {
     const { data } = await customApi.post(`/users/update-nominee`, values,
-       {
+      {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -347,14 +347,14 @@ export const updateNomineDetails = async values => {
     };
   }
 };
-export const getNominee = async (body) => {
+export const getNomineeDetails = async userId => {
   try {
-    const { data } = await customApi.get(`/user/getNominee/${body}`);
+    const { data } = await customApi.get(`/users/get-nominee/${userId}`);
     return data;
   } catch (error) {
     return {
       status: false,
-      message: error?.response?.data?.message || error?.message,
+      message: error.response?.data?.message || error.message,
     };
   }
 };
@@ -394,7 +394,7 @@ export const withdrawAmountApi = async values => {
 };
 export const deleteAccountApi = async id => {
   try {
-    const { data } = await customApi.get(`/investment_delete_account/${id}`);
+    const { data } = await customApi.get(`/delete-account/${id}`);
     return data;
   } catch (error) {
     return {

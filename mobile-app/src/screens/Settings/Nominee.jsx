@@ -17,7 +17,7 @@ import Button from '../../components/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
 import { selectUser, setUser } from '../../features/auth/authSlice';
-import { getNominee, updateNomineDetails } from '../../services/userApi';
+import { getNominee, getNomineeDetails, updateNomineDetails } from '../../services/userApi';
 import Toast from 'react-native-toast-message';
 import { CameraIcon } from 'lucide-react-native';
 import { nomineeSchema } from '../../utils/validationSchema';
@@ -127,13 +127,9 @@ const Nominee = () => {
   };
   const getAllNominee = async () => {
     setLoader(true)
-    try {
-      const res = await getNominee(user?.id)
-      if (res.status) {
-        setNomineeDetails(res?.data[0])
-      }
-    } catch (err) {
-      console.log(err.message)
+    const res = await getNomineeDetails(user?.id)
+    if (res.status) {
+      setNomineeDetails(res?.data)
     }
     setLoader(false)
   }
@@ -156,7 +152,7 @@ const Nominee = () => {
             <Formik
               initialValues={{
                 nominee: nomineeDetail?.nominee || '',
-                nominee_image: nomineeDetail?.nominee_image || null,
+                nominee_image: nomineeDetail?.attachments || null,
               }}
               validationSchema={nomineeSchema}
               onSubmit={handleUpdateNominee}>
@@ -178,8 +174,8 @@ const Nominee = () => {
                             source={
                               selectedImage
                                 ? { uri: selectedImage }
-                                : nomineeDetail?.nominee_image
-                                  ? { uri: `${API_URL}/${nomineeDetail?.nominee_image}` }
+                                : nomineeDetail?.attachments
+                                  ? { uri: `${MEDIA_URL}/${nomineeDetail?.attachments}` }
                                   : DUMMY_PROFILE_IMAGE
                             }
                             style={styles.image}

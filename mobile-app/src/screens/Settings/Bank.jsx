@@ -50,7 +50,7 @@ const Bank = () => {
       userId: user?.id
     }
     const res = await getUserBankDetails(body)
-    if (res) {
+    if (res.status) {
       setUserBankDetail(res.data[0])
     }
     setLoader(false)

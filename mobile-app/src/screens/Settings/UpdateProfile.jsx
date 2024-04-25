@@ -80,7 +80,12 @@ const UpdateProfile = () => {
     fData.append('country', values.country);
     fData.append('state', values.state);
     fData.append('city', values.city);
-    fData.append('pincode', values.pincode);
+    fData.append('pin_code', values.pincode);
+
+
+
+
+
     const res = await updateUserDetails(fData);
     if (res.status) {
       Toast.show({
@@ -210,7 +215,7 @@ const UpdateProfile = () => {
             country: user?.country || '',
             state: user?.state || '',
             city: user?.city || '',
-            pincode: user?.pincode.toString() || '',
+            pincode: user?.pin_code || '',
           }}
           validationSchema={profileInformationSchema}
           onSubmit={handleUpdateProfileData}>
@@ -264,7 +269,7 @@ const UpdateProfile = () => {
                 name={'phone'}
                 formikProps={props}
                 inputProps={{
-                  maxLength: 10,
+                  maxLength: 13,
                   keyboardType: 'phone-pad',
                 }}
               />
