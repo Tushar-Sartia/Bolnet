@@ -73,8 +73,8 @@ const Bank = () => {
             initialValues={{
               bankName: userBankDetail?.bank_name || '',
               accountNumber: userBankDetail?.account_number?.toString() || '',
-              ifscCode: userBankDetail?.ifsc || '',
-              accountHolderName: userBankDetail?.account_holder_name || '',
+              ifscCode: userBankDetail?.ifsc_code || '',
+              accountHolderName: userBankDetail?.name || '',
             }}
             validationSchema={bankSchema}
             enableReinitialize
