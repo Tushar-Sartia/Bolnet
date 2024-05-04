@@ -120,8 +120,6 @@ const Wallet = () => {
           <DashWidgets
             title={'balance'}
             value={walletBalance}
-            title2={'Total Earning'}
-            value2={totalEarning}
             color={COLORS.COLOR_GREEN}
           />
 

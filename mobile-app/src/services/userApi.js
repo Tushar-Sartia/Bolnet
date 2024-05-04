@@ -372,7 +372,7 @@ export const getInvestmentHistory = async id => {
 
 export const getWalletDataApi = async id => {
   try {
-    const { data } = await customApi.get(`/wallet/wallet-details/${id}`);
+    const { data } = await customApi.get(`/wallet/transaction/${id}`);
     return data;
   } catch (error) {
     return {
