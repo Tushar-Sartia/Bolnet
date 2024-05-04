@@ -84,7 +84,7 @@ export const getPopularProducts = async () => {
 };
 export const getAllProducts = async () => {
   try {
-    const { data } = await customApi.get(`/product/`);
+    const { data } = await customApi.get(`/product/getProduct`);
     return data;
   } catch (error) {
     return {
