@@ -61,7 +61,7 @@ const ViewProduct = ({ route, navigation }) => {
                     <View style={styles.viewStyle}>
                         <Image
                             source={{
-                                uri: `${MEDIA_URL}${item?.profile}`,
+                                uri: `${MEDIA_URL}/${item?.profile}`,
                             }}
                             style={styles.imageIcon}
                         />
@@ -100,6 +100,7 @@ const ViewProduct = ({ route, navigation }) => {
     const getReviews = async () => {
         const productId = item.id
         const res = await getProductReviews(productId)
+        console.log(res)
         if (res?.status) {
             setReviews(res?.data)
         }
